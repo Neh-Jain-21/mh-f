@@ -1,8 +1,13 @@
-import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
 
 type UserDataType = {
 	accessToken?: string;
 	userInfo?: { type: string };
+};
+
+type ApiResponseType = {
+	data?: any;
+	message: string;
 };
 
 interface ICustomRequest extends AxiosRequestConfig {
@@ -16,16 +21,16 @@ interface ICustomRequest extends AxiosRequestConfig {
 const METHOD = { GET: "get", POST: "post", PUT: "put", DELETE: "delete" };
 
 class Api {
-	loggedIn: boolean = false;
-	userData: UserDataType = {};
-	baseURL: string | undefined = "";
+	private loggedIn: boolean = false;
+	private userData: UserDataType = {};
+	private baseURL: string | undefined = "";
 
 	constructor() {
-		this.baseURL = process.env.REACT_APP_BASE_URL;
+		this.baseURL = process.env.REACT_APP_API_URL;
 		this.getAuthenticationInfo();
 	}
 
-	getAuthenticationInfo() {
+	private getAuthenticationInfo() {
 		if (localStorage.getItem("loggedIn")) {
 			this.loggedIn = true;
 
@@ -36,55 +41,75 @@ class Api {
 		}
 	}
 
-	get(url: string, data: ICustomRequest) {
+	/*
+	 * MAKE TYPESCRIPT TO HANDLE ERROR
+	 */
+	isApiError = (error: any): error is AxiosError<ApiResponseType> => {
+		if (error.response) return true;
+		else return false;
+	};
+
+	/*
+	 * GET REQUEST
+	 */
+	get(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.GET, url, data)
 				.then((response) => {
 					resolve(response);
 				})
-				.catch((error) => {
-					console.log(error);
+				.catch((error: AxiosError<ApiResponseType>) => {
+					reject(error);
 				});
 		});
 	}
 
-	post(url: string, data: ICustomRequest) {
+	/*
+	 * POST REQUEST
+	 */
+	post(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.POST, url, data)
 				.then((response) => {
 					resolve(response);
 				})
-				.catch((error) => {
-					console.log(error);
+				.catch((error: AxiosError<ApiResponseType>) => {
+					reject(error);
 				});
 		});
 	}
 
-	put(url: string, data: ICustomRequest) {
+	/*
+	 * PUT REQUEST
+	 */
+	put(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.PUT, url, data)
 				.then((response) => {
 					resolve(response);
 				})
-				.catch((error) => {
-					console.log(error);
+				.catch((error: AxiosError<ApiResponseType>) => {
+					reject(error);
 				});
 		});
 	}
 
-	delete(url: string, data: ICustomRequest) {
+	/*
+	 * DELETE REQUEST
+	 */
+	delete(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.DELETE, url, data)
 				.then((response) => {
 					resolve(response);
 				})
-				.catch((error) => {
-					console.log(error);
+				.catch((error: AxiosError<ApiResponseType>) => {
+					reject(error);
 				});
 		});
 	}
 
-	api(method: string, url: string, data: ICustomRequest) {
+	private api(method: string, url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			const axiosConfig: AxiosRequestConfig = {};
 
@@ -99,23 +124,24 @@ class Api {
 
 			axios(axiosConfig)
 				.then((response) => {
-					if (response.data && response.data.status === 500) {
-						// Notification Here
-					} else {
-						resolve(response.data);
-					}
+					resolve(response);
 				})
-				.catch((error) => {
-					console.log("ERROR", error);
+				.catch((error: AxiosError<ApiResponseType>) => {
+					if (error.response?.status === 500) {
+						// LOGOUT HERE
+					}
+
+					reject(error);
 				});
 		});
 	}
 
-	setHeaders(data: ICustomRequest) {
+	private setHeaders(data: ICustomRequest) {
 		const headers: AxiosRequestHeaders = {};
 
 		headers["accept-language"] = "en";
 		headers["Content-Type"] = "application/json";
+		headers["Bypass-Tunnel-Reminder"] = "any"; // REMOVE IF NOT LOCALTUNNEL
 
 		if (data) {
 			if (data.isMultipart) {

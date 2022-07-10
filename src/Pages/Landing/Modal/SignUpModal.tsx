@@ -2,16 +2,18 @@ import { useState } from "react";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-// components
+// COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
-// api
-import axios from "axios";
+// API
+import Api from "src/Helpers/ApiHandler";
 
 interface SignUpModalProps {
 	openSignupModal: boolean;
 	handleLoginModal: () => void;
 	handleSignupModal: () => void;
 }
+
+const api = new Api();
 
 const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: SignUpModalProps) => {
 	const { enqueueSnackbar } = useSnackbar();
@@ -44,23 +46,15 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 				});
 			} else {
 				try {
-					const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/signup`, {
-						username: details.username,
-						email: details.email,
-						password: details.password,
+					const response = await api.post("/auth/signup", {
+						data: { username: details.username, email: details.email, password: details.password },
 					});
 
-					if (response.data.status) {
-						enqueueSnackbar(response.data.message, { variant: "success" });
-
-						handleSignupModal();
-					} else {
-						enqueueSnackbar(response.data.message, { variant: "error" });
-					}
-
-					console.log(response);
+					enqueueSnackbar(response.data.message, { variant: "success" });
+					handleSignupModal();
 				} catch (error: any) {
-					enqueueSnackbar(error.response.data.message, { variant: "error" });
+					if (api.isApiError(error)) enqueueSnackbar(error.response?.data.message, { variant: "error" });
+					else console.log(error);
 				}
 			}
 		}

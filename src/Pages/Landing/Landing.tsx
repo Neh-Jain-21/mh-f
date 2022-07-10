@@ -16,7 +16,7 @@ const ImageComp = ({ img }: { img: string }) => (
 );
 
 const TextComp = ({ title, desc_one, desc_two }: { title: string; desc_one: string; desc_two: string }) => (
-	<Grid item sm={6} xs={12} container textAlign="center" direction="column" alignItems="center" justifyContent="center">
+	<Grid item sm={6} xs={12} container textAlign="center" direction="column" alignItems="center" justifyContent="center" paddingX={1}>
 		<h1>{title}</h1>
 		<h3>
 			{desc_one}
@@ -91,18 +91,9 @@ const Landing = () => {
 				<Grid container justifyContent="center" alignItems="center">
 					<Paper elevation={3} className="paper__pa">
 						{paperUi.map((value) => (
-							<Grid key={value.key} container sx={{ mt: "10vh" }}>
-								{value.reversed ? (
-									<>
-										<TextComp {...value} />
-										<ImageComp {...value} />
-									</>
-								) : (
-									<>
-										<ImageComp {...value} />
-										<TextComp {...value} />
-									</>
-								)}
+							<Grid key={value.key} container sx={{ mt: "10vh" }} direction={value.reversed ? "row-reverse" : "row"}>
+								<ImageComp {...value} />
+								<TextComp {...value} />
 							</Grid>
 						))}
 					</Paper>

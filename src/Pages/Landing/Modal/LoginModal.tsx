@@ -5,8 +5,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 // components
 import CommonModal from "src/Components/CommonModal/CommonModal";
-// api
-import axios from "axios";
+// API
+import Api from "src/Helpers/ApiHandler";
 
 interface LoginModalProps {
 	openLoginModal: boolean;
@@ -14,6 +14,8 @@ interface LoginModalProps {
 	handleSignupModal: () => void;
 	handleForgotModal: () => void;
 }
+
+const api = new Api();
 
 const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handleForgotModal }: LoginModalProps) => {
 	// const navigate = useNavigate();
@@ -31,20 +33,14 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 			enqueueSnackbar("Fill all details", { variant: "warning" });
 		} else {
 			try {
-				const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-					username: details.username,
-					password: details.password,
+				const response = await api.post("/auth/login", {
+					data: { username: details.username, password: details.password },
 				});
 
-				if (response.data.status) {
-					enqueueSnackbar(response.data.message, { variant: "success" });
-				} else {
-					enqueueSnackbar(response.data.message, { variant: "error" });
-				}
-
-				console.log(response);
+				enqueueSnackbar(response.data.message, { variant: "success" });
 			} catch (error: any) {
-				enqueueSnackbar(error.response.data.message, { variant: "error" });
+				if (api.isApiError(error)) enqueueSnackbar(error.response?.data.message, { variant: "error" });
+				else console.log(error);
 			}
 
 			// if (data.msg) {
