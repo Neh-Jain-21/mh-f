@@ -2,15 +2,17 @@ import { useState } from "react";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl, FormHelperText } from "@mui/material";
 import { Visibility, VisibilityOff, Send } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-// components
+// COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
-// api
-import axios from "axios";
+// API
+import Api from "src/Helpers/ApiHandler";
 
 interface ForgotModalProps {
 	openForgotModal: boolean;
 	handleForgotModal: () => void;
 }
+
+const api = new Api();
 
 const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) => {
 	const { enqueueSnackbar } = useSnackbar();
@@ -30,16 +32,13 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) =
 			enqueueSnackbar("Enter Email before sending", { variant: "warning" });
 		} else {
 			try {
-				const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/send-forgotpass-email`, { email: details.email });
+				const response = await api.post("/auth/send-forgotpass-email", { data: { email: details.email } });
 
-				if (response.data.status) {
-					setEmailHelper(response.data.message);
-					setDisabled({ ...disabled, otp: false });
-				} else {
-					setEmailHelper(response.data.message);
-				}
+				setEmailHelper(response.data.message);
+				setDisabled({ ...disabled, otp: false });
 			} catch (error: any) {
-				enqueueSnackbar(error.response.data.message, { variant: "error" });
+				if (api.isApiError(error)) setEmailHelper(error.response?.data.message || "Something wrong!");
+				else console.log(error);
 			}
 		}
 	};
@@ -49,16 +48,13 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) =
 			enqueueSnackbar("Enter OTP before verifying", { variant: "warning" });
 		} else {
 			try {
-				const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/verify-otp`, { email: details.email, otp: details.otp });
+				const response = await api.post("/auth/verify-otp", { data: { email: details.email, otp: details.otp } });
 
-				if (response.data.status) {
-					setOtpHelper(response.data.message);
-					setDisabled({ ...disabled, password: false, button: false });
-				} else {
-					setOtpHelper(response.data.message);
-				}
+				setOtpHelper(response.data.message);
+				setDisabled({ ...disabled, password: false, button: false });
 			} catch (error: any) {
-				enqueueSnackbar(error.response.data.message, { variant: "error" });
+				if (api.isApiError(error)) setOtpHelper(error.response?.data.message || "Something wrong!");
+				else console.log(error);
 			}
 		}
 	};
@@ -74,26 +70,20 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) =
 			});
 		} else {
 			try {
-				const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/forgotpass`, {
-					email: details.email,
-					password: details.password,
-				});
+				const response = await api.post("/auth/forgotpass", { data: { email: details.email, password: details.password } });
 
-				if (response.data.status) {
-					enqueueSnackbar(response.data.message, { variant: "success" });
+				enqueueSnackbar(response.data.message, { variant: "success" });
 
-					setTimeout(() => {
-						handleForgotModal();
-					}, 500);
-				} else {
-					enqueueSnackbar(response.data.message, { variant: "error" });
-
-					setTimeout(() => {
-						handleForgotModal();
-					}, 500);
-				}
+				setTimeout(() => {
+					handleForgotModal();
+				}, 500);
 			} catch (error: any) {
-				enqueueSnackbar(error.response.data.message, { variant: "error" });
+				if (api.isApiError(error)) {
+					enqueueSnackbar(error.response?.data.message, { variant: "error" });
+					setTimeout(() => {
+						handleForgotModal();
+					}, 500);
+				} else console.log(error);
 			}
 		}
 	};

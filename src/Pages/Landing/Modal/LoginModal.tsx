@@ -24,9 +24,7 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 	const [details, setDetails] = useState({ username: "", password: "" });
 	const [showpassword, setShowpassword] = useState(false);
 
-	const handleChangeShowPassword = () => {
-		setShowpassword(!showpassword);
-	};
+	const handleChangeShowPassword = () => setShowpassword(!showpassword);
 
 	const handleLogin = async () => {
 		if (details.username === "" || details.password === "") {

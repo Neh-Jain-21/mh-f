@@ -6,7 +6,10 @@ type UserDataType = {
 };
 
 type ApiResponseType = {
+	/** DATA RESPONDED FROM API */
 	data?: any;
+
+	/** MESSAGE RESPONDED FROM API */
 	message: string;
 };
 
@@ -52,7 +55,7 @@ class Api {
 	/*
 	 * GET REQUEST
 	 */
-	get(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
+	get(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.GET, url, data)
 				.then((response) => {
@@ -67,7 +70,7 @@ class Api {
 	/*
 	 * POST REQUEST
 	 */
-	post(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
+	post(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.POST, url, data)
 				.then((response) => {
@@ -82,7 +85,7 @@ class Api {
 	/*
 	 * PUT REQUEST
 	 */
-	put(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
+	put(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.PUT, url, data)
 				.then((response) => {
@@ -97,7 +100,7 @@ class Api {
 	/*
 	 * DELETE REQUEST
 	 */
-	delete(url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
+	delete(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			this.api(METHOD.DELETE, url, data)
 				.then((response) => {
@@ -109,7 +112,7 @@ class Api {
 		});
 	}
 
-	private api(method: string, url: string, data: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
+	private api(method: string, url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
 		return new Promise((resolve, reject) => {
 			const axiosConfig: AxiosRequestConfig = {};
 
@@ -136,7 +139,7 @@ class Api {
 		});
 	}
 
-	private setHeaders(data: ICustomRequest) {
+	private setHeaders(data?: ICustomRequest) {
 		const headers: AxiosRequestHeaders = {};
 
 		headers["accept-language"] = "en";
