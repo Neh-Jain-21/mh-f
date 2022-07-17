@@ -2,10 +2,16 @@ import { useState } from "react";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl, FormHelperText } from "@mui/material";
 import { Visibility, VisibilityOff, Send } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+//REDUX
+import actions from "src/Redux/auth/action";
 // COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
 // API
 import Api from "src/Helpers/ApiHandler";
+// TYPES
+import { reducerTypes } from "src/Redux/reducers";
 
 interface ForgotModalProps {
 	openForgotModal: boolean;
@@ -16,30 +22,40 @@ const api = new Api();
 
 const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) => {
 	const { enqueueSnackbar } = useSnackbar();
+	const dispatch = useDispatch();
 
-	const [details, setDetails] = useState({ email: "", otp: "", password: "" });
+	const tempEmail = useSelector((state: reducerTypes) => state.Auth.tempEmail);
+
+	const [details, setDetails] = useState({ email: tempEmail || "", otp: "", password: "" });
 	const [emailHelper, setEmailHelper] = useState("");
 	const [otpHelper, setOtpHelper] = useState("");
 	const [disabled, setDisabled] = useState({ otp: true, password: true, button: true });
 	const [showpassword, setShowpassword] = useState(false);
 
-	const handleChangeShowPassword = () => {
-		setShowpassword(!showpassword);
-	};
+	const handleChangeShowPassword = () => setShowpassword(!showpassword);
 
 	const sendEmail = async () => {
+		const validEmail =
+			/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/; // eslint-disable-line
+
 		if (details.email === "") {
 			enqueueSnackbar("Enter Email before sending", { variant: "warning" });
-		} else {
-			try {
-				const response = await api.post("/auth/send-forgotpass-email", { data: { email: details.email } });
+			return;
+		}
 
-				setEmailHelper(response.data.message);
-				setDisabled({ ...disabled, otp: false });
-			} catch (error: any) {
-				if (api.isApiError(error)) setEmailHelper(error.response?.data.message || "Something wrong!");
-				else console.log(error);
-			}
+		if (!validEmail.test(details.email)) {
+			enqueueSnackbar("Bad Email", { variant: "error" });
+			return;
+		}
+
+		try {
+			const response = await api.post("/auth/send-forgotpass-email", { data: { email: details.email } });
+
+			setEmailHelper(response.data.message);
+			setDisabled({ ...disabled, otp: false });
+		} catch (error: any) {
+			if (api.isApiError(error)) setEmailHelper(error.response?.data.message || "Something wrong!");
+			else console.log(error);
 		}
 	};
 
@@ -71,6 +87,8 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps) =
 		} else {
 			try {
 				const response = await api.post("/auth/forgotpass", { data: { email: details.email, password: details.password } });
+
+				dispatch(actions.setTempAuthData({ email: details.email }));
 
 				enqueueSnackbar(response.data.message, { variant: "success" });
 

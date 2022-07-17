@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import { useDispatch } from "react-redux";
+//REDUX
+import actions from "src/Redux/auth/action";
 // COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
 // API
@@ -17,15 +20,32 @@ const api = new Api();
 
 const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: SignUpModalProps) => {
 	const { enqueueSnackbar } = useSnackbar();
+	const dispatch = useDispatch();
 
 	const [details, setDetails] = useState({ username: "", email: "", password: "" });
 	const [showpassword, setShowpassword] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-	const handleChangeShowPassword = () => {
-		setShowpassword(!showpassword);
+	useEffect(() => {
+		document.addEventListener("keydown", keyDownHandler);
+
+		return () => {
+			document.removeEventListener("keydown", keyDownHandler);
+		};
+	}, [details]);
+
+	const keyDownHandler = (event: KeyboardEvent) => {
+		if (event.key === "Enter" && !loading) {
+			event.preventDefault();
+			signupUser();
+		}
 	};
 
+	const handleChangeShowPassword = () => setShowpassword(!showpassword);
+
 	const signupUser = async () => {
+		setLoading(true);
+
 		const validEmail =
 			/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/; // eslint-disable-line
 		const validPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
@@ -50,6 +70,8 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 						data: { username: details.username, email: details.email, password: details.password },
 					});
 
+					dispatch(actions.setTempAuthData({ email: details.email, username: details.username }));
+
 					enqueueSnackbar(response.data.message, { variant: "success" });
 					handleSignupModal();
 				} catch (error: any) {
@@ -58,6 +80,8 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 				}
 			}
 		}
+
+		setLoading(false);
 	};
 
 	return (
@@ -100,7 +124,7 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 					/>
 				</FormControl>
 
-				<Button variant="contained" color="primary" sx={{ mt: 2 }} type="submit" onClick={signupUser}>
+				<Button variant="contained" color="primary" sx={{ mt: 2 }} type="submit" onClick={signupUser} disabled={loading}>
 					Sign up with email
 				</Button>
 

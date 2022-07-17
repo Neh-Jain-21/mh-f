@@ -3,8 +3,20 @@ import { Close } from "@mui/icons-material";
 
 interface CommonModalProps {
 	children: JSX.Element;
+
+	/**
+	 * Title of modal to show.
+	 */
 	title: string;
+
+	/**
+	 * If true, the component is shown
+	 */
 	modalOpen: boolean;
+
+	/**
+	 * Callback fired when the component requests to be closed.
+	 */
 	handleChangeModal: () => void;
 }
 

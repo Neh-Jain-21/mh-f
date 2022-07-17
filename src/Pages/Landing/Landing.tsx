@@ -6,6 +6,7 @@ import MainDrawer from "src/Components/Drawer/Drawer";
 import LoginModal from "src/Pages/Landing/Modal/LoginModal";
 import SignupModal from "src/Pages/Landing/Modal/SignUpModal";
 import ForgotModal from "src/Pages/Landing/Modal/ForgotModal";
+import SendVerifyEmailModal from "src/Pages/Landing/Modal/SendVerifyEmailModal";
 // HELPERS
 import { paperUi } from "src/Helpers/Constants";
 
@@ -31,6 +32,7 @@ const Landing = () => {
 	const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
 	const [openSignupModal, setOpenSignupModal] = useState<boolean>(false);
 	const [openForgotModal, setOpenForgotModal] = useState<boolean>(false);
+	const [openSendVerifyEmailModal, setOpenSendVerifyEmailModal] = useState<boolean>(false);
 
 	const handleDrawerChange = () => setOpenDrawer(!openDrawer);
 
@@ -39,6 +41,8 @@ const Landing = () => {
 	const handleSignupModal = () => setOpenSignupModal(!openSignupModal);
 
 	const handleForgotModal = () => setOpenForgotModal(!openForgotModal);
+
+	const handleSendVerifyEmailModal = () => setOpenSendVerifyEmailModal(!openSendVerifyEmailModal);
 
 	const drawerData = [
 		{
@@ -111,7 +115,7 @@ const Landing = () => {
 						Explore Prices
 					</Button>
 					<h4 style={{ textAlign: "center", marginTop: 30 }}>
-						© 2022 MediaHost.com, Inc. All rights reserved.
+						© {new Date().getFullYear()} MediaHost.com, Inc. All rights reserved.
 						<br />
 						Built using React JS and Node JS
 					</h4>
@@ -125,6 +129,7 @@ const Landing = () => {
 					handleLoginModal={handleLoginModal}
 					handleSignupModal={handleSignupModal}
 					handleForgotModal={handleForgotModal}
+					handleSendVerifyEmailModal={handleSendVerifyEmailModal}
 				/>
 			)}
 
@@ -135,6 +140,11 @@ const Landing = () => {
 
 			{/* Forgot Modal */}
 			{openForgotModal && <ForgotModal openForgotModal={openForgotModal} handleForgotModal={handleForgotModal} />}
+
+			{/* Verify Email Modal */}
+			{openSendVerifyEmailModal && (
+				<SendVerifyEmailModal openSendVerifyEmailModal={openSendVerifyEmailModal} handleSendVerifyEmailModal={handleSendVerifyEmailModal} />
+			)}
 		</>
 	);
 };
