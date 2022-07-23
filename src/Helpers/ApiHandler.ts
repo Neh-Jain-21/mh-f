@@ -44,7 +44,7 @@ class Api {
 		}
 	}
 
-	/*
+	/**
 	 * MAKE TYPESCRIPT TO HANDLE ERROR
 	 */
 	isApiError = (error: any): error is AxiosError<ApiResponseType> => {
@@ -52,7 +52,7 @@ class Api {
 		else return false;
 	};
 
-	/*
+	/**
 	 * GET REQUEST
 	 */
 	get(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
@@ -67,7 +67,7 @@ class Api {
 		});
 	}
 
-	/*
+	/**
 	 * POST REQUEST
 	 */
 	post(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
@@ -82,7 +82,7 @@ class Api {
 		});
 	}
 
-	/*
+	/**
 	 * PUT REQUEST
 	 */
 	put(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {
@@ -97,7 +97,7 @@ class Api {
 		});
 	}
 
-	/*
+	/**
 	 * DELETE REQUEST
 	 */
 	delete(url: string, data?: ICustomRequest): Promise<AxiosResponse<ApiResponseType>> {

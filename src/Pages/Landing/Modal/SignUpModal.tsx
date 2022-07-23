@@ -2,29 +2,33 @@ import { useEffect, useState } from "react";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useDispatch } from "react-redux";
-//REDUX
-import actions from "src/Redux/auth/action";
 // COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
 // API
 import Api from "src/Helpers/ApiHandler";
+// REDUX
+import { useAppDispatch } from "src/Redux/hooks";
+import { setTempAuthData } from "src/Redux/auth/reducer";
 
 interface SignUpModalProps {
 	openSignupModal: boolean;
+
+	/** Opens or closes login modal */
 	handleLoginModal: () => void;
+
+	/** Opens or closes signup modal */
 	handleSignupModal: () => void;
 }
 
 const api = new Api();
 
-const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: SignUpModalProps) => {
+const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: SignUpModalProps): JSX.Element => {
 	const { enqueueSnackbar } = useSnackbar();
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
-	const [details, setDetails] = useState({ username: "", email: "", password: "" });
-	const [showpassword, setShowpassword] = useState(false);
-	const [loading, setLoading] = useState(false);
+	const [details, setDetails] = useState<{ username: string; email: string; password: string }>({ username: "", email: "", password: "" });
+	const [showpassword, setShowpassword] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		document.addEventListener("keydown", keyDownHandler);
@@ -34,6 +38,7 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 		};
 	}, [details]);
 
+	/** Enter key listener */
 	const keyDownHandler = (event: KeyboardEvent) => {
 		if (event.key === "Enter" && !loading) {
 			event.preventDefault();
@@ -41,8 +46,15 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 		}
 	};
 
+	/** Hide or show password */
 	const handleChangeShowPassword = () => setShowpassword(!showpassword);
 
+	/** Common handler for text inputs */
+	const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		setDetails({ ...details, [event.target.name]: event.target.value });
+	};
+
+	/** Signup event */
 	const signupUser = async () => {
 		setLoading(true);
 
@@ -70,12 +82,12 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 						data: { username: details.username, email: details.email, password: details.password },
 					});
 
-					dispatch(actions.setTempAuthData({ email: details.email, username: details.username }));
+					dispatch(setTempAuthData({ email: details.email, username: details.username }));
 
 					enqueueSnackbar(response.data.message, { variant: "success" });
 					handleSignupModal();
 				} catch (error: any) {
-					if (api.isApiError(error)) enqueueSnackbar(error.response?.data.message, { variant: "error" });
+					if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
 					else console.log(error);
 				}
 			}
@@ -89,22 +101,12 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 			<Grid container direction="column">
 				<FormControl sx={{ mt: 1 }} variant="standard">
 					<InputLabel htmlFor="signup-username">Username</InputLabel>
-					<Input
-						id="signup-username"
-						type="text"
-						value={details.username}
-						onChange={(event) => setDetails({ ...details, username: event.target.value })}
-					/>
+					<Input id="signup-username" type="text" name="username" value={details.username} onChange={handleChangeInput} />
 				</FormControl>
 
 				<FormControl sx={{ mt: 1 }} variant="standard">
 					<InputLabel htmlFor="Signup-email">Email Address</InputLabel>
-					<Input
-						id="Signup-email"
-						type="text"
-						value={details.email}
-						onChange={(event) => setDetails({ ...details, email: event.target.value })}
-					/>
+					<Input id="Signup-email" type="text" name="email" value={details.email} onChange={handleChangeInput} />
 				</FormControl>
 
 				<FormControl sx={{ mt: 1 }} variant="standard">
@@ -112,8 +114,9 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 					<Input
 						id="Signup-password"
 						type={showpassword ? "text" : "password"}
+						name="password"
 						value={details.password}
-						onChange={(event) => setDetails({ ...details, password: event.target.value })}
+						onChange={handleChangeInput}
 						endAdornment={
 							<InputAdornment position="end">
 								<IconButton aria-label="toggle password visibility" onClick={handleChangeShowPassword}>

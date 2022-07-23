@@ -8,19 +8,21 @@ import store from "src/Redux/store";
 // ROUTES
 import Router from "src/Routes/Router";
 
-const SnackBarButton = (notistackRef: React.RefObject<SnackbarProvider>) => (key: SnackbarKey) => {
-	const handleClick = () => {
-		if (notistackRef.current) {
-			notistackRef.current.closeSnackbar(key);
-		}
-	};
+const SnackBarButton =
+	(notistackRef: React.RefObject<SnackbarProvider>) =>
+	(key: SnackbarKey): JSX.Element => {
+		const handleClick = (): void => {
+			if (notistackRef.current) {
+				notistackRef.current.closeSnackbar(key);
+			}
+		};
 
-	return (
-		<Button sx={{ color: "white" }} onClick={handleClick}>
-			Dismiss
-		</Button>
-	);
-};
+		return (
+			<Button sx={{ color: "white" }} onClick={handleClick}>
+				Dismiss
+			</Button>
+		);
+	};
 
 const App = (): JSX.Element => {
 	const notistackRef = createRef<SnackbarProvider>();

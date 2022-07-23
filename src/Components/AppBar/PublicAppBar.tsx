@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Toolbar, AppBar as Bar, IconButton, Typography, Button } from "@mui/material";
 import { Menu } from "@mui/icons-material";
+// STYLE
+import { publicAppbarStyle as style } from "src/Components/AppBar/Appbar.style";
 
 interface AppBarProps {
 	handleDrawerChange: () => void;
@@ -8,7 +10,8 @@ interface AppBarProps {
 	handleSignupModal: () => void;
 }
 
-const AppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: AppBarProps) => {
+/** Appbar of landing page */
+const PublicAppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: AppBarProps): JSX.Element => {
 	const [appBarStyles, setAppBarStyles] = useState<React.CSSProperties>({ backgroundColor: "transparent", color: "white", boxShadow: "none" });
 
 	useEffect(() => {
@@ -19,7 +22,8 @@ const AppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: App
 		};
 	}, []);
 
-	const headerColorChange = () => {
+	/** Changes appbar style on scroll */
+	const headerColorChange = (): void => {
 		if (window.pageYOffset > 400) {
 			setAppBarStyles({ backgroundColor: "white", color: "black" });
 		} else {
@@ -30,13 +34,13 @@ const AppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: App
 	return (
 		<Bar position="fixed" style={appBarStyles}>
 			<Toolbar>
-				<IconButton edge="start" sx={{ mr: (theme) => theme.spacing(2) }} onClick={handleDrawerChange} color="inherit">
+				<IconButton edge="start" sx={style.menuIcon} onClick={handleDrawerChange} color="inherit">
 					<Menu />
 				</IconButton>
-				<Typography variant="h6" sx={{ flexGrow: 1 }}>
+				<Typography variant="h6" sx={style.title}>
 					MediaHost
 				</Typography>
-				<Button color="inherit" onClick={handleLoginModal} sx={{ mr: 2 }}>
+				<Button color="inherit" onClick={handleLoginModal} sx={style.loginBtn}>
 					Login
 				</Button>
 				<Button color="inherit" onClick={handleSignupModal}>
@@ -47,4 +51,4 @@ const AppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: App
 	);
 };
 
-export default AppBar;
+export default PublicAppBar;

@@ -4,6 +4,7 @@ import upload from "src/Assets/landingpage/upload.png";
 import fordevelopers from "src/Assets/landingpage/fordevelopers.jpg";
 import easyhosting from "src/Assets/landingpage/easyhosting.jpg";
 
+/** Paper UI displayed in landing page */
 export const paperUi = [
 	{
 		key: 1,

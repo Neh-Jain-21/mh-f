@@ -1,7 +1,6 @@
 import { Suspense, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useRoutes } from "react-router-dom";
-import { reducerTypes } from "src/Redux/reducers";
 import { useSnackbar } from "notistack";
 // COMPONENTS
 import LazyLoad from "src/Components/Lazyload/LazyLoad";
@@ -9,6 +8,8 @@ import LazyLoad from "src/Components/Lazyload/LazyLoad";
 import { privateRoutes, publicRoutes } from "src/Routes/Routes";
 // API
 import Api from "src/Helpers/ApiHandler";
+// REDUX
+import { useAppSelector } from "src/Redux/hooks";
 
 const api = new Api();
 
@@ -16,7 +17,7 @@ const Router = (): JSX.Element => {
 	const { enqueueSnackbar } = useSnackbar();
 
 	let routes = publicRoutes;
-	const loggedIn: boolean = useSelector((state: reducerTypes) => state.Auth.loggedIn) !== null;
+	const loggedIn: boolean = useAppSelector((state) => state.Auth.loggedIn) !== null;
 
 	if (loggedIn) routes = privateRoutes;
 

@@ -1,9 +1,4 @@
-import Auth, { AuthState } from "src/Redux/auth/reducer";
-
-// TYPES
-export type reducerTypes = {
-	Auth: AuthState;
-};
+import Auth from "src/Redux/auth/reducer";
 
 const reducers = { Auth };
 

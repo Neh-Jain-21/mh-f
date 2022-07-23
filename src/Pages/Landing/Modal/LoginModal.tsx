@@ -1,38 +1,43 @@
 import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router";
 import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useSelector, useDispatch } from "react-redux";
-//REDUX
-import actions from "src/Redux/auth/action";
 // COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
 // API
 import Api from "src/Helpers/ApiHandler";
-// TYPES
-import { reducerTypes } from "src/Redux/reducers";
+// REDUX
+import { useAppSelector, useAppDispatch } from "src/Redux/hooks";
+import { setTempAuthData, login } from "src/Redux/auth/reducer";
 
 interface LoginModalProps {
 	openLoginModal: boolean;
+
+	/** Opens or closes login modal */
 	handleLoginModal: () => void;
+
+	/** Opens or closes signup modal */
 	handleSignupModal: () => void;
+
+	/** Opens or closes forgot password modal */
 	handleForgotModal: () => void;
+
+	/** Opens or closes verify email modal */
 	handleSendVerifyEmailModal: () => void;
 }
 
 const api = new Api();
 
-const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handleForgotModal, handleSendVerifyEmailModal }: LoginModalProps) => {
+const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handleForgotModal, handleSendVerifyEmailModal }: LoginModalProps): JSX.Element => {
 	// const navigate = useNavigate();
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	const { enqueueSnackbar } = useSnackbar();
 
-	const tempAuth = useSelector((state: reducerTypes) => state.Auth);
+	const tempAuth = useAppSelector((state) => state.Auth);
 
-	const [details, setDetails] = useState({ username: tempAuth.tempUsername || tempAuth.tempEmail || "", password: "" });
-	const [showpassword, setShowpassword] = useState(false);
-	const [loading, setLoading] = useState(false);
+	const [details, setDetails] = useState<{ username: string; password: string }>({ username: tempAuth.tempUsername || tempAuth.tempEmail || "", password: "" });
+	const [showpassword, setShowpassword] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		document.addEventListener("keydown", keyDownHandler);
@@ -42,16 +47,30 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 		};
 	}, [details]);
 
-	const keyDownHandler = (event: KeyboardEvent) => {
+	/** Enter key listener */
+	const keyDownHandler = (event: KeyboardEvent): void => {
 		if (event.key === "Enter" && !loading) {
 			event.preventDefault();
 			handleLogin();
 		}
 	};
 
-	const handleChangeShowPassword = () => setShowpassword(!showpassword);
+	/** Hide or show password */
+	const handleChangeShowPassword = (): void => setShowpassword(!showpassword);
 
-	const handleLogin = async () => {
+	/** Common function for forgot modal and signup modal */
+	const handleForgotOrSignupModal = (callBack: () => void) => () => {
+		handleLoginModal();
+		setTimeout(callBack, 500);
+	};
+
+	/** Common handler for text inputs */
+	const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		setDetails({ ...details, [event.target.name]: event.target.value });
+	};
+
+	/** Login event */
+	const handleLogin = async (): Promise<void> => {
 		setLoading(true);
 
 		if (details.username === "" || details.password === "") {
@@ -62,28 +81,17 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 					data: { username: details.username, password: details.password },
 				});
 
-				dispatch(actions.setTempAuthData({ [details.username.includes("@") ? "email" : "username"]: details.username }));
+				dispatch(login({ token: response.data.data?.token }));
+				dispatch(setTempAuthData({ [details.username.includes("@") ? "email" : "username"]: details.username }));
 
 				enqueueSnackbar(response.data.message, { variant: "success" });
 			} catch (error: any) {
 				if (api.isApiError(error)) {
-					enqueueSnackbar(error.response?.data.message, { variant: "error" });
+					enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
 
 					if (error.response?.status === 405) handleSendVerifyEmailModal();
 				} else console.log(error);
 			}
-
-			// if (data.msg) {
-			// 	setLogindetails({
-			// 		username: "",
-			// 		password: "",
-			// 	});
-			// 	handleLoginModal();
-			// 	enqueueSnackbar(data.msg, { variant: "success" });
-			// 	// history.push("/Dashboard");
-			// } else {
-			// 	enqueueSnackbar(data.err, { variant: "error" });
-			// }
 		}
 
 		setLoading(false);
@@ -94,7 +102,7 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 			<Grid container direction="column">
 				<FormControl sx={{ mt: 1 }} variant="standard">
 					<InputLabel>Username or Email</InputLabel>
-					<Input type="text" value={details.username} onChange={(event) => setDetails({ ...details, username: event.target.value })} />
+					<Input type="text" name="username" value={details.username} onChange={handleChangeInput} />
 				</FormControl>
 
 				<FormControl sx={{ mt: 1 }} variant="standard">
@@ -102,7 +110,8 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 					<Input
 						type={showpassword ? "text" : "password"}
 						value={details.password}
-						onChange={(event) => setDetails({ ...details, password: event.target.value })}
+						name="password"
+						onChange={handleChangeInput}
 						endAdornment={
 							<InputAdornment position="end">
 								<IconButton aria-label="toggle password visibility" onClick={handleChangeShowPassword}>
@@ -114,13 +123,7 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 				</FormControl>
 
 				<Grid container justifyContent="flex-end" sx={{ mt: 1 }}>
-					<span
-						onClick={() => {
-							handleLoginModal();
-							setTimeout(handleForgotModal, 500);
-						}}
-						style={{ color: "blue", cursor: "pointer" }}
-					>
+					<span onClick={handleForgotOrSignupModal(handleForgotModal)} style={{ color: "blue", cursor: "pointer" }}>
 						Forgot Password
 					</span>
 				</Grid>
@@ -132,13 +135,7 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 				<Grid container justifyContent="flex-end" sx={{ mt: 1 }}>
 					<p>
 						New User?{" "}
-						<span
-							onClick={() => {
-								handleLoginModal();
-								setTimeout(handleSignupModal, 500);
-							}}
-							style={{ color: "blue", cursor: "pointer" }}
-						>
+						<span onClick={handleForgotOrSignupModal(handleSignupModal)} style={{ color: "blue", cursor: "pointer" }}>
 							Signup Here
 						</span>
 					</p>

@@ -1,7 +1,11 @@
 import { lazy } from "react";
 import { Navigate, Outlet, RouteObject } from "react-router-dom";
+// COMPONENTS
+const Layout = lazy(() => import("src/Components/Layout/Layout"));
 // PAGES
 const Landing = lazy(() => import("src/Pages/Landing/Landing"));
+const Dashboard = lazy(() => import("src/Pages/Dashboard/Dashboard"));
+
 /**Add your public routes here */
 const publicRoutes: RouteObject[] = [
 	{
@@ -16,15 +20,15 @@ const publicRoutes: RouteObject[] = [
 
 /**Add your private routes here */
 const privateRoutes: RouteObject[] = [
-	// {
-	// 	path: "/",
-	// 	element: <Layout />,
-	// 	children: [
-	// 		{ path: "dashboard", element: <Dashboard /> },
-	// 		{ path: "/", element: <Navigate to="/dashboard" replace /> },
-	// 		{ path: "*", element: <Navigate to="/dashboard" replace /> },
-	// 	],
-	// },
+	{
+		path: "/",
+		element: <Layout />,
+		children: [
+			{ path: "dashboard", element: <Dashboard /> },
+			{ path: "/", element: <Navigate to="/dashboard" replace /> },
+			{ path: "*", element: <Navigate to="/dashboard" replace /> },
+		],
+	},
 ];
 
 export { privateRoutes, publicRoutes };

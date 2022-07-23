@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { Typography, Button, Grid, Paper } from "@mui/material";
 // COMPONENTS
-import AppBar from "src/Components/AppBar/AppBar";
-import MainDrawer from "src/Components/Drawer/Drawer";
+import PublicAppBar from "src/Components/AppBar/PublicAppBar";
+import PublicDrawer from "src/Components/Drawer/PublicDrawer";
 import LoginModal from "src/Pages/Landing/Modal/LoginModal";
 import SignupModal from "src/Pages/Landing/Modal/SignUpModal";
 import ForgotModal from "src/Pages/Landing/Modal/ForgotModal";
 import SendVerifyEmailModal from "src/Pages/Landing/Modal/SendVerifyEmailModal";
+// STYLES
+import style from "src/Pages/Landing/Landing.style";
 // HELPERS
 import { paperUi } from "src/Helpers/Constants";
 
-const ImageComp = ({ img }: { img: string }) => (
+const ImageComp = ({ img }: { img: string }): JSX.Element => (
 	<Grid item xs={12} sm={6} container direction="column" alignItems="center">
 		<img style={{ minWidth: 100, borderRadius: "10px", maxWidth: "80%" }} src={img} alt="UI" />
 	</Grid>
 );
 
-const TextComp = ({ title, desc_one, desc_two }: { title: string; desc_one: string; desc_two: string }) => (
+const TextComp = ({ title, desc_one, desc_two }: { title: string; desc_one: string; desc_two: string }): JSX.Element => (
 	<Grid item sm={6} xs={12} container textAlign="center" direction="column" alignItems="center" justifyContent="center" paddingX={1}>
 		<h1>{title}</h1>
 		<h3>
@@ -27,22 +29,27 @@ const TextComp = ({ title, desc_one, desc_two }: { title: string; desc_one: stri
 	</Grid>
 );
 
-const Landing = () => {
+const Landing = (): JSX.Element => {
 	const [openDrawer, setOpenDrawer] = useState<boolean>(false);
 	const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
 	const [openSignupModal, setOpenSignupModal] = useState<boolean>(false);
 	const [openForgotModal, setOpenForgotModal] = useState<boolean>(false);
 	const [openSendVerifyEmailModal, setOpenSendVerifyEmailModal] = useState<boolean>(false);
 
-	const handleDrawerChange = () => setOpenDrawer(!openDrawer);
+	/** Opens or closes drawer */
+	const handleDrawerChange = (): void => setOpenDrawer(!openDrawer);
 
-	const handleLoginModal = () => setOpenLoginModal(!openLoginModal);
+	/** Opens or closes login modal */
+	const handleLoginModal = (): void => setOpenLoginModal(!openLoginModal);
 
-	const handleSignupModal = () => setOpenSignupModal(!openSignupModal);
+	/** Opens or closes signup modal */
+	const handleSignupModal = (): void => setOpenSignupModal(!openSignupModal);
 
-	const handleForgotModal = () => setOpenForgotModal(!openForgotModal);
+	/** Opens or closes forgot password modal */
+	const handleForgotModal = (): void => setOpenForgotModal(!openForgotModal);
 
-	const handleSendVerifyEmailModal = () => setOpenSendVerifyEmailModal(!openSendVerifyEmailModal);
+	/** Opens or closes verify email modal */
+	const handleSendVerifyEmailModal = (): void => setOpenSendVerifyEmailModal(!openSendVerifyEmailModal);
 
 	const drawerData = [
 		{
@@ -72,21 +79,21 @@ const Landing = () => {
 	return (
 		<>
 			{/* Appbar */}
-			<AppBar handleDrawerChange={handleDrawerChange} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />
+			<PublicAppBar handleDrawerChange={handleDrawerChange} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />
 
 			{/* Drawer */}
-			<MainDrawer drawerData={drawerData} openDrawer={openDrawer} handleDrawerChange={handleDrawerChange} />
+			<PublicDrawer drawerData={drawerData} openDrawer={openDrawer} handleDrawerChange={handleDrawerChange} />
 
 			<div style={{ backgroundColor: "whitesmoke" }}>
 				<div className="landingImage">
-					<Grid container direction="column" alignItems="center" justifyContent="center" sx={{ height: 500 }}>
-						<Typography sx={{ userSelect: "none", fontSize: { xs: 30, md: 50 } }} color="white" textAlign="center" component="h1">
+					<Grid container direction="column" alignItems="center" justifyContent="center" sx={style.heroSection}>
+						<Typography sx={style.heroSectionTitle} color="white" textAlign="center" component="h1">
 							Easy Media Hosting For Your Apps
 						</Typography>
 						<Typography mx="10vw" color="white" textAlign="center" component="h4">
 							We provide best media hosting solutions for you next app, Join us now.
 						</Typography>
-						<Button sx={{ mt: 5 }} color="error" variant="contained" onClick={handleSignupModal}>
+						<Button sx={style.heroSectionJoinText} color="error" variant="contained" onClick={handleSignupModal}>
 							Join Us
 						</Button>
 					</Grid>
@@ -95,7 +102,7 @@ const Landing = () => {
 				<Grid container justifyContent="center" alignItems="center">
 					<Paper elevation={3} className="paper__pa">
 						{paperUi.map((value) => (
-							<Grid key={value.key} container sx={{ mt: "10vh" }} direction={value.reversed ? "row-reverse" : "row"}>
+							<Grid key={value.key} container sx={style.imagesSectionGrid} direction={value.reversed ? "row-reverse" : "row"}>
 								<ImageComp {...value} />
 								<TextComp {...value} />
 							</Grid>
@@ -103,15 +110,9 @@ const Landing = () => {
 					</Paper>
 				</Grid>
 
-				<Grid
-					container
-					direction="column"
-					justifyContent="center"
-					alignItems="center"
-					sx={{ backgroundColor: "#132340", color: "white", pt: 12 }}
-				>
+				<Grid container direction="column" justifyContent="center" alignItems="center" sx={style.footerSection}>
 					<h1>MediaHost</h1>
-					<Button sx={{ mt: 2 }} size="large" color="secondary" variant="contained">
+					<Button sx={style.footerSectionButton} size="large" color="secondary" variant="contained">
 						Explore Prices
 					</Button>
 					<h4 style={{ textAlign: "center", marginTop: 30 }}>
@@ -134,17 +135,13 @@ const Landing = () => {
 			)}
 
 			{/* signup Modal */}
-			{openSignupModal && (
-				<SignupModal openSignupModal={openSignupModal} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />
-			)}
+			{openSignupModal && <SignupModal openSignupModal={openSignupModal} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />}
 
 			{/* Forgot Modal */}
 			{openForgotModal && <ForgotModal openForgotModal={openForgotModal} handleForgotModal={handleForgotModal} />}
 
 			{/* Verify Email Modal */}
-			{openSendVerifyEmailModal && (
-				<SendVerifyEmailModal openSendVerifyEmailModal={openSendVerifyEmailModal} handleSendVerifyEmailModal={handleSendVerifyEmailModal} />
-			)}
+			{openSendVerifyEmailModal && <SendVerifyEmailModal openSendVerifyEmailModal={openSendVerifyEmailModal} handleSendVerifyEmailModal={handleSendVerifyEmailModal} />}
 		</>
 	);
 };
