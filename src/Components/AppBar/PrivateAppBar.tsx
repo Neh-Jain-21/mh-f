@@ -1,72 +1,155 @@
-import { Toolbar, AppBar, IconButton, Typography, Button, Autocomplete, TextField, Badge } from "@mui/material";
-import { Menu, Search, EmailOutlined, NotificationsNoneOutlined, AccountCircleOutlined, MoreVertOutlined } from "@mui/icons-material";
+import React, { useState } from "react";
+import { Toolbar, AppBar, IconButton, Menu, Badge, MenuItem, Autocomplete, TextField, Grid } from "@mui/material";
+import { Menu as MenuIcon, EmailOutlined, NotificationsNoneOutlined, AccountCircleOutlined, MoreVertOutlined, ExitToApp, Search } from "@mui/icons-material";
+import { useSnackbar } from "notistack";
 // STYLE
 import { privateAppbarStyle as style } from "src/Components/AppBar/Appbar.style";
+import { NavLink } from "react-router-dom";
+// API
+import Api from "src/Helpers/ApiHandler";
+// REDUX
+import { useAppDispatch } from "src/Redux/hooks";
+import { logout } from "src/Redux/auth/reducer";
+
+interface MobileMenuProps {
+	mobileMoreAnchorEl: (EventTarget & HTMLButtonElement) | null;
+	handleMobileMenuClose: () => void;
+	handleLogout: () => void;
+}
+
+const api = new Api();
 
 /** Appbar of landing page */
 const PrivateAppBar = (): JSX.Element => {
+	const dispatch = useAppDispatch();
+	const { enqueueSnackbar } = useSnackbar();
+
+	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null);
+	const [state, setState] = useState(false);
+	const [users, setUsers] = useState([]);
+	const [searchValue, setSearchValue] = useState("");
+
+	/** Close mobile menu */
+	const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
+
+	/** Open mobile menu */
+	const handleMobileMenuOpen = (event: React.SyntheticEvent<HTMLButtonElement>) => setMobileMoreAnchorEl(event.currentTarget);
+
+	/** Logout event */
+	const handleLogout = async () => {
+		try {
+			const response = await api.get("/auth/logout");
+
+			dispatch(logout());
+
+			enqueueSnackbar(response.data.message, { variant: "success" });
+		} catch (error: any) {
+			if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
+			else console.log(error);
+		}
+	};
+
 	return (
-		<div style={{ flexGrow: 1 }}>
+		<>
 			<AppBar sx={style.appbar} position="static">
 				<Toolbar>
 					<IconButton edge="start" sx={style.menuButton} color="inherit" aria-label="open drawer" /* onClick={() => setState(true)} */>
-						<Menu />
+						<MenuIcon />
 					</IconButton>
-					{/* <p className={style.title}>MediaHost</p> */}
+					<p style={{ width: "140px" }}>MediaHost</p>
 
-					{/* <div style={{ width: "100%" }}>
+					<div style={{ width: "100%" }}>
 						<Autocomplete
-							className={style.search}
+							sx={style.search}
 							freeSolo
-							options={users.map((user) => user.username)}
+							options={[]}
 							renderInput={(params) => (
-								<>
-									<div style={{ display: "flex", flexDirection: "row" }}>
-										<TextField {...params} value={searchValue} onInput={handleSearch} placeholder="Search…" style={{ root: style.inputRoot, input: style.inputInput }} />
-										<IconButton
-											size="small"
-											onClick={() => {
-												if (searchValue !== "") history.push(`/Profile/${searchValue}`);
-											}}
-										>
-											<Search />
-										</IconButton>
-									</div>
-								</>
+								<div style={{ display: "flex", flexDirection: "row" }}>
+									<TextField {...params} fullWidth /* value={searchValue} onInput={handleSearch} */ placeholder="Search…" sx={style.searchInput} size="small" />
+									<IconButton
+										size="small"
+										// onClick={() => {
+										// 	if (searchValue !== "") history.push(`/Profile/${searchValue}`);
+										// }}
+									>
+										<Search />
+									</IconButton>
+								</div>
 							)}
 						/>
-					</div> */}
+					</div>
 
-					<div style={{ flexGrow: 1 }} />
-					<div /* className={style.sectionDesktop} */>
-						<IconButton aria-label="show 4 new mails" color="inherit">
-							<Badge badgeContent={4} color="secondary">
+					<Grid display="flex" direction="row" flexWrap="nowrap">
+						<IconButton color="inherit" sx={{ mr: 1, display: { xs: "none", md: "inline-flex" } }}>
+							<Badge badgeContent={0} color="secondary">
 								<EmailOutlined />
 							</Badge>
 						</IconButton>
-						<IconButton aria-label="show 17 new notifications" color="inherit">
-							<Badge badgeContent={17} color="secondary">
+						<IconButton color="inherit" sx={{ mr: 1, display: { xs: "none", md: "inline-flex" } }}>
+							<Badge badgeContent={0} color="secondary">
 								<NotificationsNoneOutlined />
 							</Badge>
 						</IconButton>
-						<IconButton edge="end" aria-label="account of current user" /* aria-controls={menuId} */ aria-haspopup="true" /* onClick={handleProfileMenuOpen} */ color="inherit">
+						<IconButton edge="end" sx={{ mr: 0.5, display: { xs: "none", md: "inline-flex" } }} /* onClick={handleProfileMenuOpen} */ color="inherit">
 							<AccountCircleOutlined />
 						</IconButton>
-					</div>
-					<div /* className={style.sectionMobile} */>
-						<IconButton edge="end" aria-label="show more" /* aria-controls={mobileMenuId} */ aria-haspopup="true" /* onClick={handleMobileMenuOpen} */ color="inherit">
+						<IconButton edge="end" sx={{ mr: 0.5, display: { xs: "inline-flex", md: "none" } }} onClick={handleMobileMenuOpen} color="inherit">
 							<MoreVertOutlined />
 						</IconButton>
-					</div>
+						<IconButton edge="end" sx={{ display: { xs: "none", md: "inline-flex" } }} color="inherit" onClick={handleLogout}>
+							<ExitToApp />
+						</IconButton>
+					</Grid>
 				</Toolbar>
 			</AppBar>
-			{/* {renderMobileMenu}
-			{renderMenu}
-			<SwipeableDrawer anchor="left" open={state} onClose={toggleDrawer(false)} onOpen={toggleDrawer(true)}>
+
+			<MobileMenu mobileMoreAnchorEl={mobileMoreAnchorEl} handleMobileMenuClose={handleMobileMenuClose} handleLogout={handleLogout} />
+			{/* <SwipeableDrawer anchor="left" open={state} onClose={toggleDrawer(false)} onOpen={toggleDrawer(true)}>
 				{list()}
 			</SwipeableDrawer> */}
-		</div>
+		</>
 	);
 };
+
+const MobileMenu = ({ mobileMoreAnchorEl, handleMobileMenuClose, handleLogout }: MobileMenuProps): JSX.Element => (
+	<Menu
+		anchorEl={mobileMoreAnchorEl}
+		onClose={handleMobileMenuClose}
+		open={Boolean(mobileMoreAnchorEl)}
+		anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+		transformOrigin={{ vertical: "top", horizontal: "right" }}
+	>
+		<MenuItem>
+			<IconButton color="inherit">
+				<Badge badgeContent={0} color="secondary">
+					<EmailOutlined />
+				</Badge>
+			</IconButton>
+			<p>Messages</p>
+		</MenuItem>
+		<MenuItem>
+			<IconButton color="inherit">
+				<Badge badgeContent={0} color="secondary">
+					<NotificationsNoneOutlined />
+				</Badge>
+			</IconButton>
+			<p>Notifications</p>
+		</MenuItem>
+		<NavLink style={{ textDecoration: "none", color: "black" }} to="/Myprofile">
+			<MenuItem>
+				<IconButton color="inherit">
+					<AccountCircleOutlined />
+				</IconButton>
+				<p>Profile</p>
+			</MenuItem>
+		</NavLink>
+		<MenuItem>
+			<IconButton color="inherit" onClick={handleLogout}>
+				<ExitToApp />
+			</IconButton>
+			<p>LogOut</p>
+		</MenuItem>
+	</Menu>
+);
 
 export default PrivateAppBar;

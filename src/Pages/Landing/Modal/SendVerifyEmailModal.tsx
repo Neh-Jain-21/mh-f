@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IconButton, Grid, Input, InputAdornment, InputLabel, FormControl, FormHelperText } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useSelector, useDispatch } from "react-redux";
 // COMPONENTS
 import CommonModal from "src/Components/CommonModal/CommonModal";
 // API

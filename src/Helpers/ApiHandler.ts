@@ -25,6 +25,7 @@ const METHOD = { GET: "get", POST: "post", PUT: "put", DELETE: "delete" };
 
 class Api {
 	private loggedIn: boolean = false;
+	private token: string = "";
 	private userData: UserDataType = {};
 	private baseURL: string | undefined = "";
 
@@ -37,9 +38,10 @@ class Api {
 		if (localStorage.getItem("loggedIn")) {
 			this.loggedIn = true;
 
-			const user_data = localStorage.getItem("user_data");
-			if (user_data) {
-				this.userData = JSON.parse(user_data);
+			const token = localStorage.getItem("token");
+
+			if (token) {
+				this.token = token;
 			}
 		}
 	}
@@ -161,8 +163,8 @@ class Api {
 		}
 
 		if (this.loggedIn && !(data && data.skipAuth)) {
-			if (this.userData.accessToken) {
-				headers["authorization"] = this.userData.accessToken;
+			if (this.token) {
+				headers["authorization"] = this.token;
 			}
 			if (this.userData.userInfo?.type) {
 				headers["admin_type"] = this.userData.userInfo.type;
