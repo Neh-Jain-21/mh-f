@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Toolbar, AppBar, IconButton, Menu, Badge, MenuItem, Autocomplete, TextField, Grid } from "@mui/material";
+import { Toolbar, AppBar, IconButton, Menu, Badge, MenuItem, Autocomplete, TextField, Grid, Typography } from "@mui/material";
 import { Menu as MenuIcon, EmailOutlined, NotificationsNoneOutlined, AccountCircleOutlined, MoreVertOutlined, ExitToApp, Search } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 // STYLE
@@ -11,6 +11,10 @@ import Api from "src/Helpers/ApiHandler";
 import { useAppDispatch } from "src/Redux/hooks";
 import { logout } from "src/Redux/auth/reducer";
 
+interface PrivateAppBarProps {
+	handleDrawerChange: () => void;
+}
+
 interface MobileMenuProps {
 	mobileMoreAnchorEl: (EventTarget & HTMLButtonElement) | null;
 	handleMobileMenuClose: () => void;
@@ -20,7 +24,7 @@ interface MobileMenuProps {
 const api = new Api();
 
 /** Appbar of landing page */
-const PrivateAppBar = (): JSX.Element => {
+const PrivateAppBar = ({ handleDrawerChange }: PrivateAppBarProps): JSX.Element => {
 	const dispatch = useAppDispatch();
 	const { enqueueSnackbar } = useSnackbar();
 
@@ -53,10 +57,10 @@ const PrivateAppBar = (): JSX.Element => {
 		<>
 			<AppBar sx={style.appbar} position="static">
 				<Toolbar>
-					<IconButton edge="start" sx={style.menuButton} color="inherit" aria-label="open drawer" /* onClick={() => setState(true)} */>
+					<IconButton edge="start" sx={style.menuButton} color="inherit" aria-label="open drawer" onClick={handleDrawerChange}>
 						<MenuIcon />
 					</IconButton>
-					<p style={{ width: "140px" }}>MediaHost</p>
+					<Typography sx={{ width: "140px", display: { xs: "none", sm: "inline-flex" } }}>MediaHost</Typography>
 
 					<div style={{ width: "100%" }}>
 						<Autocomplete
@@ -79,7 +83,7 @@ const PrivateAppBar = (): JSX.Element => {
 						/>
 					</div>
 
-					<Grid display="flex" direction="row" flexWrap="nowrap">
+					<Grid width="auto" container display="flex" direction="row" flexWrap="nowrap">
 						<IconButton color="inherit" sx={{ mr: 1, display: { xs: "none", md: "inline-flex" } }}>
 							<Badge badgeContent={0} color="secondary">
 								<EmailOutlined />
@@ -104,9 +108,6 @@ const PrivateAppBar = (): JSX.Element => {
 			</AppBar>
 
 			<MobileMenu mobileMoreAnchorEl={mobileMoreAnchorEl} handleMobileMenuClose={handleMobileMenuClose} handleLogout={handleLogout} />
-			{/* <SwipeableDrawer anchor="left" open={state} onClose={toggleDrawer(false)} onOpen={toggleDrawer(true)}>
-				{list()}
-			</SwipeableDrawer> */}
 		</>
 	);
 };

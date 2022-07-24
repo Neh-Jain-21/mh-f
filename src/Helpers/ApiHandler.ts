@@ -1,4 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
+// REDUX
+import store from "src/Redux/store";
+import { logout } from "src/Redux/auth/reducer";
 
 type UserDataType = {
 	accessToken?: string;
@@ -132,8 +135,8 @@ class Api {
 					resolve(response);
 				})
 				.catch((error: AxiosError<ApiResponseType>) => {
-					if (error.response?.status === 500) {
-						// LOGOUT HERE
+					if (error.response?.status === 401) {
+						store.dispatch(logout());
 					}
 
 					reject(error);

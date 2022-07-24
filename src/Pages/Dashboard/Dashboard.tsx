@@ -41,12 +41,12 @@ const Dashboard = () => {
 					</Slide>
 					<Slide direction="left" in timeout={2000}>
 						<Grid>
-							<NavLink to="/Images" style={{ textDecoration: "none", color: "white" }}>
+							<NavLink to="/images" style={{ textDecoration: "none", color: "white" }}>
 								<Button style={{ marginRight: 20 }} variant="outlined" color="inherit">
 									Upload Image
 								</Button>
 							</NavLink>
-							<NavLink to="/Videos" style={{ textDecoration: "none", color: "white" }}>
+							<NavLink to="/videos" style={{ textDecoration: "none", color: "white" }}>
 								<Button variant="outlined" color="inherit">
 									Upload Video
 								</Button>

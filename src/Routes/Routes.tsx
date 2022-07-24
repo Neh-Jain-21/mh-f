@@ -5,6 +5,7 @@ const Layout = lazy(() => import("src/Components/Layout/Layout"));
 // PAGES
 const Landing = lazy(() => import("src/Pages/Landing/Landing"));
 const Dashboard = lazy(() => import("src/Pages/Dashboard/Dashboard"));
+const Images = lazy(() => import("src/Pages/Images/Images"));
 
 /**Add your public routes here */
 const publicRoutes: RouteObject[] = [
@@ -25,6 +26,7 @@ const privateRoutes: RouteObject[] = [
 		element: <Layout />,
 		children: [
 			{ path: "dashboard", element: <Dashboard /> },
+			{ path: "images", element: <Images /> },
 			{ path: "/", element: <Navigate to="/dashboard" replace /> },
 			{ path: "*", element: <Navigate to="/dashboard" replace /> },
 		],

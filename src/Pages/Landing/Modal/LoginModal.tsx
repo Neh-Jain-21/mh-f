@@ -81,7 +81,7 @@ const LoginModal = ({ openLoginModal, handleLoginModal, handleSignupModal, handl
 					data: { username: details.username, password: details.password },
 				});
 
-				dispatch(login({ token: response.data.data?.token }));
+				dispatch(login({ token: response.data.data?.token, name: response.data.data?.name }));
 				dispatch(setTempAuthData({ [details.username.includes("@") ? "email" : "username"]: details.username }));
 
 				enqueueSnackbar(response.data.message, { variant: "success" });
