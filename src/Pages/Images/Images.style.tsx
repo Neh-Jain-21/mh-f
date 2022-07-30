@@ -9,7 +9,7 @@ const style: Style = {
 		position: "relative",
 	},
 	title: {
-		marginLeft: (theme: Theme) => theme.spacing(2),
+		ml: (theme: Theme) => theme.spacing(2),
 		flex: 1,
 	},
 	root: {
@@ -36,8 +36,10 @@ const style: Style = {
 		width: "90%",
 		maxWidth: 500,
 		objectFit: "contain",
-		marginTop: 30,
-		marginBottom: 30,
+		my: 30,
+	},
+	textField: {
+		mb: "20px",
 	},
 };
 

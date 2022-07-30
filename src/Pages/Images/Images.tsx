@@ -1,32 +1,27 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Grid, makeStyles, Fab, Dialog, AppBar, Toolbar, IconButton, Typography, Button, Slide, CardMedia, Card, Divider, TextField, Switch, Box } from "@mui/material";
-// import { useDropzone } from "react-dropzone";
+import React, { useState, useEffect } from "react";
+import { Grid, Fab, Dialog, AppBar, Toolbar, IconButton, Typography, Button, Slide, CardMedia, Card, Divider, TextField, Switch, Box } from "@mui/material";
 import { useSnackbar } from "notistack";
 // ICONS
 import { Add, Close } from "@mui/icons-material";
 // COMPONENTS
 import ImageCard from "src/Components/ImageCard/ImageCard";
+import Dropzone from "src/Components/Dropzone/Dropzone";
 // STYLE
 import style from "src/Pages/Images/Images.style";
 // API
 import Api from "src/Helpers/ApiHandler";
-
-// const Transition = React.forwardRef(function Transition(props, ref) {
-// 	return <Slide direction="up" ref={ref} {...props} />;
-// });
+// TYPES
+import { TransitionProps } from "@mui/material/transitions";
 
 const api = new Api();
 
 const Images = () => {
 	const { enqueueSnackbar } = useSnackbar();
 
-	const [openAdd, setOpenAdd] = useState(false);
-	//details
-	const [title, setTitle] = useState("");
-	const [caption, setCaption] = useState("");
-	const [publicPost, setPublicPost] = useState(true);
+	const [openImageDialog, setOpenImageDialog] = useState<boolean>(false);
+	const [details, setDetails] = useState<{ title: string; caption: string; private: boolean }>({ title: "", caption: "", private: true });
 	// photo state
-	const [file, setFile] = useState("");
+	const [file, setFile] = useState<File | null>(null);
 	const [img, setImg] = useState("");
 	//hide state
 	const [hidefileinp, setHidefileinp] = useState(false);
@@ -34,19 +29,9 @@ const Images = () => {
 	//getIamges
 	const [images, setImages] = useState<{ path: string; image: string; title: string; caption: string; isPrivate: boolean }[]>([]);
 
-	// const loadFile = (event) => {
-	// 	//preview image
-	// 	if (event.target.files[0] !== undefined) {
-	// 		setFile(event.target.files[0]);
-	// 		setImg(URL.createObjectURL(event.target.files[0]));
-	// 		setHidefileinp(true);
-	// 		setHideimg(false);
-	// 	}
-	// };
-
 	useEffect(() => {
 		fetchImages();
-	}, [file]);
+	}, [file]); // eslint-disable-line
 
 	const fetchImages = async () => {
 		try {
@@ -56,6 +41,25 @@ const Images = () => {
 		} catch (error) {
 			if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
 			else console.log(error);
+		}
+	};
+
+	/** Opens or closes add image dialog */
+	const handleChangeAddImageDialog = () => setOpenImageDialog(!openImageDialog);
+
+	/** Handle change text inputs */
+	const handleChangeText = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDetails({ ...details, [event.target.name]: event.target.value });
+
+	/** Handle switch change */
+	const handleChangeSwitch = (event: React.ChangeEvent<HTMLInputElement>) => setDetails({ ...details, [event.target.name]: event.target.checked });
+
+	/** Sets selected image in state and previews it */
+	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event?.target?.files && event.target.files[0]) {
+			setFile(event.target.files[0]);
+			setImg(URL.createObjectURL(event.target.files[0]));
+			setHidefileinp(true);
+			setHideimg(false);
 		}
 	};
 
@@ -78,65 +82,6 @@ const Images = () => {
 	// 	}
 	// };
 
-	//Dropzone
-	// function Dropzone() {
-	// 	const classes = useStyles();
-
-	// 	const baseStyle = {
-	// 		flex: 1,
-	// 		display: "flex",
-	// 		flexDirection: "column",
-	// 		alignItems: "center",
-	// 		userSelect: "none",
-	// 		justifyContent: "center",
-	// 		padding: "20px",
-	// 		borderWidth: 2,
-	// 		borderRadius: 2,
-	// 		borderColor: "#eeeeee",
-	// 		borderStyle: "dashed",
-	// 		backgroundColor: "#fafafa",
-	// 		color: "#bdbdbd",
-	// 		outline: "none",
-	// 		transition: "border .24s ease-in-out",
-	// 	};
-
-	// 	const activeStyle = {
-	// 		borderColor: "#2196f3",
-	// 	};
-
-	// 	const acceptStyle = {
-	// 		borderColor: "#00e676",
-	// 	};
-
-	// 	const rejectStyle = {
-	// 		borderColor: "#ff1744",
-	// 	};
-
-	// 	const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
-	// 		accept: "image/jpeg, image/png",
-	// 	});
-
-	// 	const style = useMemo(
-	// 		() => ({
-	// 			...baseStyle,
-	// 			...(isDragActive ? activeStyle : {}),
-	// 			...(isDragAccept ? acceptStyle : {}),
-	// 			...(isDragReject ? rejectStyle : {}),
-	// 		}),
-	// 		[isDragActive, isDragReject, isDragAccept]
-	// 	);
-
-	// 	return (
-	// 		<div className={classes.container} hidden={hidefileinp}>
-	// 			<div {...getRootProps({ style })}>
-	// 				<input {...getInputProps()} onChange={loadFile} />
-	// 				<p>Drag 'n' drop some files here, or click to select files</p>
-	// 				<em>(Only *.jpeg and *.png images will be accepted)</em>
-	// 			</div>
-	// 		</div>
-	// 	);
-	// }
-
 	return (
 		<>
 			<Box sx={style.toolbar}></Box>
@@ -154,91 +99,50 @@ const Images = () => {
 						<ImageCard key={index} path={image.path} image={`data:image;base64,${image.image}`} title={image.title} caption={image.caption} isPrivate={image.isPrivate} />
 					))}
 				</Grid>
-				<Fab color="secondary" onClick={() => setOpenAdd(true)} sx={style.add}>
+				<Fab color="primary" onClick={handleChangeAddImageDialog} sx={style.add}>
 					<Add />
 				</Fab>
 			</div>
 
 			{/* Add Image Dialog */}
-			{/* <Dialog fullScreen open={openAdd} onClose={() => setOpenAdd(false)} TransitionComponent={Transition}>
-				<AppBar color="secondary" className={classes.appBar}>
+			<Dialog fullScreen open={openImageDialog} onClose={handleChangeAddImageDialog} TransitionComponent={Transition}>
+				<AppBar color="primary" sx={style.appBar}>
 					<Toolbar>
-						<IconButton
-							edge="start"
-							color="inherit"
-							onClick={() => {
-								setOpenAdd(false);
-							}}
-							aria-label="close"
-						>
+						<IconButton edge="start" color="inherit" onClick={handleChangeAddImageDialog}>
 							<Close />
 						</IconButton>
-						<Typography variant="h6" className={classes.title}>
+						<Typography variant="h6" sx={style.title}>
 							Upload Image
 						</Typography>
-						<Button
-							autoFocus
-							color="inherit"
-							onClick={() => {
-								Upload();
-							}}
-						>
-							Upload
-						</Button>
+						<Button color="inherit" /* onClick={Upload} */>Upload</Button>
 					</Toolbar>
 				</AppBar>
 
-				<Dropzone />
+				<Dropzone hidden={hidefileinp} onChange={handleImageChange} />
 
 				<Grid container direction="row" justifyContent="center">
-					<Card className={classes.card} hidden={hideimg}>
-						<CardMedia
-							component="img"
-							// height="140"
-							height="auto"
-							image={img}
-							title="Contemplative Reptile"
-						/>
+					<Card sx={style.card} hidden={hideimg}>
+						<CardMedia component="img" height="auto" image={img} title="Contemplative Reptile" />
 					</Card>
 				</Grid>
 				<Divider />
-				<form className={classes.root} noValidate autoComplete="off">
+				<form style={{ margin: "20px" }} noValidate autoComplete="off">
 					<Grid container direction="column">
-						<TextField
-							label="Title"
-							variant="filled"
-							value={title}
-							onChange={(event) => {
-								setTitle(event.target.value);
-							}}
-							disabled={hideimg}
-						/>
-						<div style={{ paddingTop: 20 }}></div>
-						<TextField
-							label="Caption"
-							variant="filled"
-							value={caption}
-							onChange={(event) => {
-								setCaption(event.target.value);
-							}}
-							disabled={hideimg}
-						/>
-						<div style={{ paddingTop: 20 }}></div>
+						<TextField sx={style.textField} label="Title" variant="filled" name="title" value={details.title} onChange={handleChangeText} disabled={hideimg} />
+						<TextField sx={style.textField} label="Caption" variant="filled" name="caption" value={details.caption} onChange={handleChangeText} disabled={hideimg} />
 						<Grid container direction="row" alignItems="center" justifyContent="center">
 							<h4>Keep Private?</h4>
-							<Switch
-								checked={publicPost}
-								onChange={(e) => {
-									setPublicPost(e.target.checked);
-								}}
-								color="primary"
-							/>
+							<Switch checked={details.private} name="private" onChange={handleChangeSwitch} color="primary" />
 						</Grid>
 					</Grid>
 				</form>
-			</Dialog> */}
+			</Dialog>
 		</>
 	);
 };
+
+const Transition = React.forwardRef(function Transition(props: TransitionProps & { children: React.ReactElement<any, any> }, ref: React.Ref<unknown>) {
+	return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default Images;
