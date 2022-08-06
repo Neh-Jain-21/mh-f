@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { IconButton, Drawer, ListItem, ListItemText, Grid, Paper, SwipeableDrawer, List, Divider, ListItemIcon } from "@mui/material";
+import { ListItem, ListItemText, Grid, SwipeableDrawer, List, Divider, ListItemIcon } from "@mui/material";
 import { HomeOutlined, ImageOutlined, VideocamOutlined, CodeOutlined, SettingsInputComponentOutlined } from "@mui/icons-material";
 // REDUX
 import { useAppSelector } from "src/Redux/hooks";

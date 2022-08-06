@@ -14,8 +14,8 @@ const style: Style = {
 		color: "white",
 	},
 	cardWidth: {
-		marginTop: 20,
-		marginRight: { xs: 20, sm: 0 },
+		marginTop: "20px",
+		marginRight: { xs: 0, sm: 0 },
 	},
 	add: {
 		position: "fixed",

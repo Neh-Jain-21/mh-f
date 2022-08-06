@@ -27,14 +27,9 @@ import style from "src/Components/ImageCard/ImageCard.style";
 // API
 import Api from "src/Helpers/ApiHandler";
 
-// const Transition = React.forwardRef(function Transition(props, ref) {
-// 	return <Slide direction="up" ref={ref} {...props} />;
-// });
-
 const api = new Api();
 
 interface ImageCardProps {
-	path: string;
 	image: string;
 	title: string;
 	caption: string;

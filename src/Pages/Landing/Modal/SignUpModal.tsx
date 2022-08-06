@@ -36,7 +36,7 @@ const SignupModal = ({ openSignupModal, handleLoginModal, handleSignupModal }: S
 		return () => {
 			document.removeEventListener("keydown", keyDownHandler);
 		};
-	}, [details]);
+	}, [details]); // eslint-disable-line
 
 	/** Enter key listener */
 	const keyDownHandler = (event: KeyboardEvent) => {

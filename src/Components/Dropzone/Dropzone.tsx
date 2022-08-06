@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useDropzone } from "react-dropzone";
+import { useCallback, useMemo } from "react";
+import { useDropzone, FileRejection, DropEvent } from "react-dropzone";
 
 const baseStyle: React.CSSProperties = {
 	flex: 1,
@@ -30,11 +30,14 @@ interface DropZoneProps {
 	hidden: boolean;
 
 	/** Handle file change */
-	onChange: React.ChangeEventHandler<HTMLInputElement>;
+	onChange: <T extends File>(acceptedFiles: T[], fileRejections: FileRejection[], event: DropEvent) => void;
 }
 
 const Dropzone = (props: DropZoneProps) => {
-	const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({ accept: { "image/jpeg": [".jpeg"], "image/png": [".png"] } });
+	/** Handle file change */
+	const onDrop = useCallback<typeof props.onChange>(props.onChange, []); // eslint-disable-line
+
+	const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({ accept: { "image/jpeg": [".jpeg"], "image/png": [".png"] }, onDrop, multiple: false });
 
 	const style = useMemo(
 		() => ({ ...baseStyle, ...(isDragActive ? activeStyle : {}), ...(isDragAccept ? acceptStyle : {}), ...(isDragReject ? rejectStyle : {}) }),
@@ -44,7 +47,7 @@ const Dropzone = (props: DropZoneProps) => {
 	return (
 		<div style={{ margin: "20px" }} hidden={props.hidden}>
 			<div {...getRootProps({ style })}>
-				<input {...getInputProps()} onChange={props.onChange} />
+				<input {...getInputProps()} />
 				<p>Drag 'n' drop some files here, or click to select files</p>
 				<em>(Only *.jpeg and *.png images will be accepted)</em>
 			</div>

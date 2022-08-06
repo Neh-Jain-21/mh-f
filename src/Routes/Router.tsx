@@ -1,5 +1,4 @@
 import { Suspense, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useRoutes } from "react-router-dom";
 import { useSnackbar } from "notistack";
 // COMPONENTS
@@ -25,7 +24,7 @@ const Router = (): JSX.Element => {
 
 	useEffect(() => {
 		checkServerOffline();
-	}, []);
+	}, []); // eslint-disable-line
 
 	const checkServerOffline = async () => {
 		try {

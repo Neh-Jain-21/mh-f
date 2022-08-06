@@ -29,9 +29,9 @@ const PrivateAppBar = ({ handleDrawerChange }: PrivateAppBarProps): JSX.Element 
 	const { enqueueSnackbar } = useSnackbar();
 
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<(EventTarget & HTMLButtonElement) | null>(null);
-	const [state, setState] = useState(false);
-	const [users, setUsers] = useState([]);
-	const [searchValue, setSearchValue] = useState("");
+	// const [state, setState] = useState(false);
+	// const [users, setUsers] = useState([]);
+	// const [searchValue, setSearchValue] = useState("");
 
 	/** Close mobile menu */
 	const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);

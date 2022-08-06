@@ -20,14 +20,13 @@ const Images = () => {
 
 	const [openImageDialog, setOpenImageDialog] = useState<boolean>(false);
 	const [details, setDetails] = useState<{ title: string; caption: string; private: boolean }>({ title: "", caption: "", private: true });
-	// photo state
 	const [file, setFile] = useState<File | null>(null);
 	const [img, setImg] = useState("");
-	//hide state
+	// HIDE IMAGE
 	const [hidefileinp, setHidefileinp] = useState(false);
 	const [hideimg, setHideimg] = useState(true);
-	//getIamges
-	const [images, setImages] = useState<{ path: string; image: string; title: string; caption: string; isPrivate: boolean }[]>([]);
+	// IMAGE DATA
+	const [images, setImages] = useState<{ imageData: string; title: string; caption: string; isPrivate: boolean }[]>([]);
 
 	useEffect(() => {
 		fetchImages();
@@ -37,7 +36,7 @@ const Images = () => {
 		try {
 			const response = await api.get("/images");
 
-			setImages(response.data.data?.images || []);
+			setImages(response.data.data?.list || []);
 		} catch (error) {
 			if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
 			else console.log(error);
@@ -54,33 +53,39 @@ const Images = () => {
 	const handleChangeSwitch = (event: React.ChangeEvent<HTMLInputElement>) => setDetails({ ...details, [event.target.name]: event.target.checked });
 
 	/** Sets selected image in state and previews it */
-	const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (event?.target?.files && event.target.files[0]) {
-			setFile(event.target.files[0]);
-			setImg(URL.createObjectURL(event.target.files[0]));
+	const handleImageChange = <T extends File>(acceptedFiles: T[]): void => {
+		if (acceptedFiles && acceptedFiles[0]) {
+			setFile(acceptedFiles[0]);
+			setImg(URL.createObjectURL(acceptedFiles[0]));
 			setHidefileinp(true);
 			setHideimg(false);
 		}
 	};
 
-	// const Upload = async () => {
-	// 	if (title === "" || img === "" || caption === "") {
-	// 		enqueueSnackbar("Fill All Details", { variant: "warning" });
-	// 	} else {
-	// 		const formData = new FormData();
-	// 		formData.append("userid", cookies.get("userId"));
-	// 		formData.append("image", file);
-	// 		formData.append("title", title);
-	// 		formData.append("caption", caption);
-	// 		formData.append("isPrivate", publicPost);
+	const Upload = async () => {
+		try {
+			if (details.title === "" || details.caption === "" || !file) {
+				enqueueSnackbar("Fill all details", { variant: "warning" });
+			} else {
+				const formData = new FormData();
 
-	// 		const res = await axios.post(`http://${Config.port}:5000/Uploadimage`, formData);
+				formData.append("image", file);
+				formData.append("title", details.title);
+				formData.append("caption", details.caption);
+				formData.append("isPrivate", JSON.stringify(details.private));
 
-	// 		enqueueSnackbar(res.data.msg, { variant: "success" });
-	// 		setOpenAdd(false);
-	// 		setFile("");
-	// 	}
-	// };
+				const response = await api.post("/images", { data: formData });
+
+				enqueueSnackbar(response.data.message, { variant: "success" });
+				handleChangeAddImageDialog();
+				setFile(null);
+				setDetails({ title: "", caption: "", private: true });
+			}
+		} catch (error) {
+			if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
+			else console.log(error);
+		}
+	};
 
 	return (
 		<>
@@ -96,7 +101,7 @@ const Images = () => {
 
 				<Grid container direction="row">
 					{images.map((image, index) => (
-						<ImageCard key={index} path={image.path} image={`data:image;base64,${image.image}`} title={image.title} caption={image.caption} isPrivate={image.isPrivate} />
+						<ImageCard key={index} image={`data:image;base64,${image.imageData}`} title={image.title} caption={image.caption} isPrivate={image.isPrivate} />
 					))}
 				</Grid>
 				<Fab color="primary" onClick={handleChangeAddImageDialog} sx={style.add}>
@@ -114,7 +119,9 @@ const Images = () => {
 						<Typography variant="h6" sx={style.title}>
 							Upload Image
 						</Typography>
-						<Button color="inherit" /* onClick={Upload} */>Upload</Button>
+						<Button color="inherit" onClick={Upload}>
+							Upload
+						</Button>
 					</Toolbar>
 				</AppBar>
 
