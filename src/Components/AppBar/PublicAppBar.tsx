@@ -38,7 +38,7 @@ const PublicAppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal 
 					<Menu />
 				</IconButton>
 				<Typography variant="h6" sx={style.title}>
-					MediaHost
+					Reactive Templates
 				</Typography>
 				<Button color="inherit" onClick={handleLoginModal} sx={style.loginBtn}>
 					Login

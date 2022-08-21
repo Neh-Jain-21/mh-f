@@ -188,28 +188,15 @@ const ImageCard = (props: ImageCardProps) => {
 				<Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
 					<Card sx={style.cardWidth}>
 						<CardActionArea>
-							<CardMedia
-								component="img"
-								alt="..."
-								// height="140"
-								height="auto"
-								image={props.image}
-							/>
+							{/* <CardMedia component="img" alt="..." height="auto" image={props.image} /> */}
+							<Grid pt={`${(200 * 60) / 100}px`} height="200px">
+								<Grid height="100%" sx={{ backgroundColor: "darkgrey" }}></Grid>
+							</Grid>
 
 							<CardContent>
-								{props.isPrivate ? (
-									<>
-										<Typography variant="subtitle2" component="h6">
-											Stored Privately
-										</Typography>
-									</>
-								) : (
-									<>
-										<Typography variant="subtitle2" component="h6">
-											Shared Publicly
-										</Typography>
-									</>
-								)}
+								<Typography variant="subtitle2" component="h6">
+									{props.isPrivate ? "Stored Privately" : "Shared Publicly"}
+								</Typography>
 								<Typography gutterBottom variant="h5" component="h2">
 									{props.title}
 								</Typography>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Fab, Dialog, AppBar, Toolbar, IconButton, Typography, Button, Slide, CardMedia, Card, Divider, TextField, Switch, Box } from "@mui/material";
+import { Grid, Fab, Dialog, AppBar, Toolbar, IconButton, Typography, Button, Slide, CardMedia, Card, Divider, TextField, Switch, Box, CircularProgress } from "@mui/material";
 import { useSnackbar } from "notistack";
 // ICONS
 import { Add, Close } from "@mui/icons-material";
@@ -22,6 +22,7 @@ const Images = () => {
 	const [details, setDetails] = useState<{ title: string; caption: string; private: boolean }>({ title: "", caption: "", private: true });
 	const [file, setFile] = useState<File | null>(null);
 	const [img, setImg] = useState("");
+	const [loading, setLoading] = useState<boolean>(true);
 	// HIDE IMAGE
 	const [hidefileinp, setHidefileinp] = useState(false);
 	const [hideimg, setHideimg] = useState(true);
@@ -30,16 +31,19 @@ const Images = () => {
 
 	useEffect(() => {
 		fetchImages();
-	}, [file]); // eslint-disable-line
+	}, []); // eslint-disable-line
 
 	const fetchImages = async () => {
 		try {
+			setLoading(true);
 			const response = await api.get("/images");
 
 			setImages(response.data.data?.list || []);
+			setLoading(false);
 		} catch (error) {
 			if (api.isApiError(error)) enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
 			else console.log(error);
+			setLoading(false);
 		}
 	};
 
@@ -62,11 +66,34 @@ const Images = () => {
 		}
 	};
 
+	const onUploadProgress = (progressEvent: any) => {
+		const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+		console.log(percentCompleted);
+	};
+
 	const Upload = async () => {
 		try {
 			if (details.title === "" || details.caption === "" || !file) {
 				enqueueSnackbar("Fill all details", { variant: "warning" });
 			} else {
+				handleChangeAddImageDialog();
+				setImages((prev) => {
+					prev.unshift({
+						...details,
+						isPrivate: details.private,
+						imageData: (() => {
+							const reader = new FileReader();
+							reader.readAsDataURL(file);
+							if (typeof reader.result === "string") {
+								return reader.result;
+							} else {
+								return "";
+							}
+						})(),
+					});
+					return prev;
+				});
+
 				const formData = new FormData();
 
 				formData.append("image", file);
@@ -74,10 +101,9 @@ const Images = () => {
 				formData.append("caption", details.caption);
 				formData.append("isPrivate", JSON.stringify(details.private));
 
-				const response = await api.post("/images", { data: formData });
+				const response = await api.post("/images", { data: formData, onUploadProgress });
 
 				enqueueSnackbar(response.data.message, { variant: "success" });
-				handleChangeAddImageDialog();
 				setFile(null);
 				setDetails({ title: "", caption: "", private: true });
 			}
@@ -91,22 +117,30 @@ const Images = () => {
 		<>
 			<Box sx={style.toolbar}></Box>
 			<div style={{ margin: "20px" }}>
-				{images.length ? (
-					<h1 style={{ userSelect: "none", textAlign: "center" }}>YOUR COLLECTION</h1>
+				{loading ? (
+					<Grid container direction="row" alignItems="center" justifyContent="center" height="80vh">
+						<CircularProgress />
+					</Grid>
 				) : (
-					<div style={{ userSelect: "none", display: "flex", height: "80vh", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-						<h1 style={{ textAlign: "center" }}>Looks Empty Here!</h1>
-					</div>
-				)}
+					<>
+						{images.length ? (
+							<h1 style={{ userSelect: "none", textAlign: "center" }}>YOUR COLLECTION</h1>
+						) : (
+							<Grid container direction="row" alignItems="center" justifyContent="center" height="80vh">
+								<h1>Looks Empty Here!</h1>
+							</Grid>
+						)}
 
-				<Grid container direction="row">
-					{images.map((image, index) => (
-						<ImageCard key={index} image={`data:image;base64,${image.imageData}`} title={image.title} caption={image.caption} isPrivate={image.isPrivate} />
-					))}
-				</Grid>
-				<Fab color="primary" onClick={handleChangeAddImageDialog} sx={style.add}>
-					<Add />
-				</Fab>
+						<Grid container direction="row">
+							{images.map((image, index) => (
+								<ImageCard key={index} image={`data:image;base64,${image.imageData}`} title={image.title} caption={image.caption} isPrivate={image.isPrivate} />
+							))}
+						</Grid>
+						<Fab color="primary" onClick={handleChangeAddImageDialog} sx={style.add}>
+							<Add />
+						</Fab>
+					</>
+				)}
 			</div>
 
 			{/* Add Image Dialog */}

@@ -19,7 +19,7 @@ const PublicDrawer = ({ drawerData, openDrawer, handleDrawerChange }: MainDrawer
 			</IconButton>
 			<Grid container direction="column" alignItems="center" justifyContent="center" sx={{ height: "92vh" }}>
 				{drawerData.map((data) => (
-					<ListItem button key={data.key} onClick={data.onClick} sx={{ textAlign: "center", maxWidth: 411 }}>
+					<ListItem key={data.key} button onClick={data.onClick} sx={{ textAlign: "center", maxWidth: 411 }}>
 						<ListItemText primary={data.key} />
 					</ListItem>
 				))}

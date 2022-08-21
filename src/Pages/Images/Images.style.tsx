@@ -36,7 +36,7 @@ const style: Style = {
 		width: "90%",
 		maxWidth: 500,
 		objectFit: "contain",
-		my: 30,
+		my: "30px",
 	},
 	textField: {
 		mb: "20px",

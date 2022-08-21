@@ -128,6 +128,7 @@ class Api {
 			if (data) {
 				if (data.params) axiosConfig.params = data.params;
 				if (data.data) axiosConfig.data = data.data;
+				if (data.onUploadProgress) axiosConfig.onUploadProgress = data.onUploadProgress;
 			}
 
 			axios(axiosConfig)

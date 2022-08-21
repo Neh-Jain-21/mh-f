@@ -9,6 +9,8 @@ import ForgotModal from "src/Pages/Landing/Modal/ForgotModal";
 import SendVerifyEmailModal from "src/Pages/Landing/Modal/SendVerifyEmailModal";
 // STYLES
 import style from "src/Pages/Landing/Landing.style";
+// ICONS
+import { ArrowRightAlt, AccountCircle, FileDownload, Inventory } from "@mui/icons-material";
 // HELPERS
 import { paperUi } from "src/Helpers/Constants";
 
@@ -88,14 +90,22 @@ const Landing = (): JSX.Element => {
 				<div className="landingImage">
 					<Grid container direction="column" alignItems="center" justifyContent="center" sx={style.heroSection}>
 						<Typography sx={style.heroSectionTitle} color="white" textAlign="center" component="h1">
-							Easy Media Hosting For Your Apps
+							Best Reactive Templates Just For You
 						</Typography>
 						<Typography mx="10vw" color="white" textAlign="center" component="h4">
-							We provide best media hosting solutions for you next app, Join us now.
+							We provide prebuilt web templates for your next app, Join us now.
 						</Typography>
-						<Button sx={style.heroSectionJoinText} color="error" variant="contained" onClick={handleSignupModal}>
-							Join Us
-						</Button>
+						<Grid mt={5}>
+							<Button color="error" variant="contained" onClick={handleSignupModal}>
+								Join Us
+							</Button>
+							<Typography mx="10px" my="auto" color="white" textAlign="center" component="span">
+								OR
+							</Typography>
+							<Button color="primary" variant="contained" endIcon={<ArrowRightAlt />} onClick={handleSignupModal}>
+								Explore
+							</Button>
+						</Grid>
 					</Grid>
 				</div>
 
@@ -111,15 +121,39 @@ const Landing = (): JSX.Element => {
 				</Grid>
 
 				<Grid container direction="column" justifyContent="center" alignItems="center" sx={style.footerSection}>
-					<h1>MediaHost</h1>
-					<Button sx={style.footerSectionButton} size="large" color="secondary" variant="contained">
-						Explore Prices
-					</Button>
-					<h4 style={{ textAlign: "center", marginTop: 30 }}>
-						© {new Date().getFullYear()} MediaHost.com, Inc. All rights reserved.
-						<br />
-						Built using React JS and Node JS
-					</h4>
+					<h1>Reactive Templates</h1>
+
+					<Grid container direction="row" mt={4} justifyContent="center" alignItems="center">
+						<Grid item xs={12} sm={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+							<AccountCircle sx={{ fontSize: 60, mb: 2 }} />
+							<Typography color="white" textAlign="center" component="h4" variant="h4">
+								0
+							</Typography>
+							<Typography color="white" textAlign="center" component="h5" variant="h5">
+								Accounts
+							</Typography>
+						</Grid>
+						<Grid item xs={12} sm={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+							<FileDownload sx={{ fontSize: 60, mb: 2 }} />
+							<Typography color="white" textAlign="center" component="h4" variant="h4">
+								0
+							</Typography>
+							<Typography color="white" textAlign="center" component="h5" variant="h5">
+								Downloads
+							</Typography>
+						</Grid>
+						<Grid item xs={12} sm={12} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+							<Inventory sx={{ fontSize: 60, mb: 2 }} />
+							<Typography color="white" textAlign="center" component="h4" variant="h4">
+								0
+							</Typography>
+							<Typography color="white" textAlign="center" component="h5" variant="h5">
+								Products
+							</Typography>
+						</Grid>
+					</Grid>
+
+					<h4 style={{ textAlign: "center", marginTop: 30 }}>© {new Date().getFullYear()} Reactive Templates, all rights reserved.</h4>
 				</Grid>
 			</div>
 
