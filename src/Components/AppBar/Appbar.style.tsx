@@ -6,10 +6,11 @@ type Style = {
 
 export const publicAppbarStyle: Style = {
 	menuIcon: {
-		mr: (theme: Theme) => theme.spacing(2),
+		mr: (theme: Theme) => ({ xs: theme.spacing(0), sm: theme.spacing(2) }),
 	},
 	title: {
 		flexGrow: 1,
+		fontSize: { xs: "1rem", sm: "1.25rem" },
 	},
 	loginBtn: {
 		mr: 2,

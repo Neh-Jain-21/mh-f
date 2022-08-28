@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Typography, Button, Grid, Paper } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 // COMPONENTS
 import PublicAppBar from "src/Components/AppBar/PublicAppBar";
 import PublicDrawer from "src/Components/Drawer/PublicDrawer";
-import LoginModal from "src/Pages/Landing/Modal/LoginModal";
-import SignupModal from "src/Pages/Landing/Modal/SignUpModal";
-import ForgotModal from "src/Pages/Landing/Modal/ForgotModal";
 import SendVerifyEmailModal from "src/Pages/Landing/Modal/SendVerifyEmailModal";
 // STYLES
 import style from "src/Pages/Landing/Landing.style";
@@ -32,40 +30,32 @@ const TextComp = ({ title, desc_one, desc_two }: { title: string; desc_one: stri
 );
 
 const Landing = (): JSX.Element => {
+	const navigate = useNavigate();
+
 	const [openDrawer, setOpenDrawer] = useState<boolean>(false);
-	const [openLoginModal, setOpenLoginModal] = useState<boolean>(false);
-	const [openSignupModal, setOpenSignupModal] = useState<boolean>(false);
-	const [openForgotModal, setOpenForgotModal] = useState<boolean>(false);
-	const [openSendVerifyEmailModal, setOpenSendVerifyEmailModal] = useState<boolean>(false);
 
 	/** Opens or closes drawer */
 	const handleDrawerChange = (): void => setOpenDrawer(!openDrawer);
 
-	/** Opens or closes login modal */
-	const handleLoginModal = (): void => setOpenLoginModal(!openLoginModal);
+	/** Navigates to login screen */
+	const handleNavigateToLogin = (): void => navigate("/login");
 
-	/** Opens or closes signup modal */
-	const handleSignupModal = (): void => setOpenSignupModal(!openSignupModal);
-
-	/** Opens or closes forgot password modal */
-	const handleForgotModal = (): void => setOpenForgotModal(!openForgotModal);
-
-	/** Opens or closes verify email modal */
-	const handleSendVerifyEmailModal = (): void => setOpenSendVerifyEmailModal(!openSendVerifyEmailModal);
+	/** Navigates to signup screen */
+	const handleNavigateToSignup = (): void => navigate("/signup");
 
 	const drawerData = [
 		{
 			key: "Login",
 			onClick: () => {
 				handleDrawerChange();
-				setTimeout(handleLoginModal, 500);
+				setTimeout(handleNavigateToLogin, 500);
 			},
 		},
 		{
 			key: "Signup",
 			onClick: () => {
 				handleDrawerChange();
-				setTimeout(handleSignupModal, 500);
+				setTimeout(handleNavigateToSignup, 500);
 			},
 		},
 		{
@@ -81,7 +71,7 @@ const Landing = (): JSX.Element => {
 	return (
 		<>
 			{/* Appbar */}
-			<PublicAppBar handleDrawerChange={handleDrawerChange} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />
+			<PublicAppBar handleDrawerChange={handleDrawerChange} handleNavigateToLogin={handleNavigateToLogin} handleNavigateToSignup={handleNavigateToSignup} />
 
 			{/* Drawer */}
 			<PublicDrawer drawerData={drawerData} openDrawer={openDrawer} handleDrawerChange={handleDrawerChange} />
@@ -96,13 +86,13 @@ const Landing = (): JSX.Element => {
 							We provide prebuilt web templates for your next app, Join us now.
 						</Typography>
 						<Grid mt={5}>
-							<Button color="error" variant="contained" onClick={handleSignupModal}>
+							<Button color="error" variant="contained" onClick={handleNavigateToSignup}>
 								Join Us
 							</Button>
 							<Typography mx="10px" my="auto" color="white" textAlign="center" component="span">
 								OR
 							</Typography>
-							<Button color="primary" variant="contained" endIcon={<ArrowRightAlt />} onClick={handleSignupModal}>
+							<Button color="primary" variant="contained" endIcon={<ArrowRightAlt />}>
 								Explore
 							</Button>
 						</Grid>
@@ -124,7 +114,7 @@ const Landing = (): JSX.Element => {
 					<h1>Reactive Templates</h1>
 
 					<Grid container direction="row" mt={4} justifyContent="center" alignItems="center">
-						<Grid item xs={12} sm={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+						<Grid item xs={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
 							<AccountCircle sx={{ fontSize: 60, mb: 2 }} />
 							<Typography color="white" textAlign="center" component="h4" variant="h4">
 								0
@@ -133,7 +123,7 @@ const Landing = (): JSX.Element => {
 								Accounts
 							</Typography>
 						</Grid>
-						<Grid item xs={12} sm={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+						<Grid item xs={6} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
 							<FileDownload sx={{ fontSize: 60, mb: 2 }} />
 							<Typography color="white" textAlign="center" component="h4" variant="h4">
 								0
@@ -142,7 +132,7 @@ const Landing = (): JSX.Element => {
 								Downloads
 							</Typography>
 						</Grid>
-						<Grid item xs={12} sm={12} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
+						<Grid item xs={12} md={4} lg={2} mb={5} container direction="column" justifyContent="center" alignItems="center">
 							<Inventory sx={{ fontSize: 60, mb: 2 }} />
 							<Typography color="white" textAlign="center" component="h4" variant="h4">
 								0
@@ -157,25 +147,8 @@ const Landing = (): JSX.Element => {
 				</Grid>
 			</div>
 
-			{/* Login Modal */}
-			{openLoginModal && (
-				<LoginModal
-					openLoginModal={openLoginModal}
-					handleLoginModal={handleLoginModal}
-					handleSignupModal={handleSignupModal}
-					handleForgotModal={handleForgotModal}
-					handleSendVerifyEmailModal={handleSendVerifyEmailModal}
-				/>
-			)}
-
-			{/* signup Modal */}
-			{openSignupModal && <SignupModal openSignupModal={openSignupModal} handleLoginModal={handleLoginModal} handleSignupModal={handleSignupModal} />}
-
-			{/* Forgot Modal */}
-			{openForgotModal && <ForgotModal openForgotModal={openForgotModal} handleForgotModal={handleForgotModal} />}
-
 			{/* Verify Email Modal */}
-			{openSendVerifyEmailModal && <SendVerifyEmailModal openSendVerifyEmailModal={openSendVerifyEmailModal} handleSendVerifyEmailModal={handleSendVerifyEmailModal} />}
+			{/* {openSendVerifyEmailModal && <SendVerifyEmailModal openSendVerifyEmailModal={openSendVerifyEmailModal} handleSendVerifyEmailModal={handleSendVerifyEmailModal} />} */}
 		</>
 	);
 };

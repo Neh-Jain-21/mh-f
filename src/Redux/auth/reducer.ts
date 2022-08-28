@@ -5,7 +5,6 @@ interface AuthState {
 	name: string | null;
 	loggedIn: string | null;
 	tempEmail: string | null;
-	tempUsername: string | null;
 }
 
 const initialState: AuthState = {
@@ -13,7 +12,6 @@ const initialState: AuthState = {
 	name: localStorage.getItem("name"),
 	loggedIn: localStorage.getItem("loggedIn"),
 	tempEmail: localStorage.getItem("tempEmail"),
-	tempUsername: localStorage.getItem("tempUsername"),
 };
 
 export const counterSlice = createSlice({
@@ -31,16 +29,11 @@ export const counterSlice = createSlice({
 			state.token = action.payload.token;
 		},
 
-		/** Sets temp email and username in redux and localstorage for auth purposes */
-		setTempAuthData: (state, action: PayloadAction<{ email?: string; username?: string }>) => {
+		/** Sets temp email in redux and localstorage for auth purposes */
+		setTempAuthData: (state, action: PayloadAction<{ email?: string }>) => {
 			if (action.payload.email) {
 				localStorage.setItem("tempEmail", action.payload.email);
 				state.tempEmail = action.payload.email;
-			}
-
-			if (action.payload.username) {
-				localStorage.setItem("tempUsername", action.payload.username);
-				state.tempUsername = action.payload.username;
 			}
 		},
 

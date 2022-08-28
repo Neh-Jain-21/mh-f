@@ -6,12 +6,12 @@ import { publicAppbarStyle as style } from "src/Components/AppBar/Appbar.style";
 
 interface AppBarProps {
 	handleDrawerChange: () => void;
-	handleLoginModal: () => void;
-	handleSignupModal: () => void;
+	handleNavigateToLogin: () => void;
+	handleNavigateToSignup: () => void;
 }
 
 /** Appbar of landing page */
-const PublicAppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal }: AppBarProps): JSX.Element => {
+const PublicAppBar = ({ handleDrawerChange, handleNavigateToLogin, handleNavigateToSignup }: AppBarProps): JSX.Element => {
 	const [appBarStyles, setAppBarStyles] = useState<React.CSSProperties>({ backgroundColor: "transparent", color: "white", boxShadow: "none" });
 
 	useEffect(() => {
@@ -40,10 +40,10 @@ const PublicAppBar = ({ handleDrawerChange, handleLoginModal, handleSignupModal 
 				<Typography variant="h6" sx={style.title}>
 					Reactive Templates
 				</Typography>
-				<Button color="inherit" onClick={handleLoginModal} sx={style.loginBtn}>
+				<Button color="inherit" onClick={handleNavigateToLogin} sx={style.loginBtn}>
 					Login
 				</Button>
-				<Button color="inherit" onClick={handleSignupModal}>
+				<Button color="inherit" onClick={handleNavigateToSignup}>
 					Signup
 				</Button>
 			</Toolbar>

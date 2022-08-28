@@ -1,25 +1,24 @@
 import { useState } from "react";
-import { IconButton, Button, Grid, Input, InputAdornment, InputLabel, FormControl, FormHelperText, CircularProgress } from "@mui/material";
-import { Visibility, VisibilityOff, Send } from "@mui/icons-material";
+import { Button, CircularProgress, FormControl, FormHelperText, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
-// COMPONENTS
-import CommonModal from "src/Components/CommonModal/CommonModal";
-// API
-import Api from "src/Helpers/ApiHandler";
+import { useNavigate } from "react-router-dom";
 // REDUX
 import { useAppSelector, useAppDispatch } from "src/Redux/hooks";
 import { setTempAuthData } from "src/Redux/auth/reducer";
-
-interface ForgotModalProps {
-	openForgotModal: boolean;
-
-	/** Opens or closes forgot password modal */
-	handleForgotModal: () => void;
-}
+// API
+import Api from "src/Helpers/ApiHandler";
+// ICONS
+import { Send, Visibility, VisibilityOff } from "@mui/icons-material";
+// IMAGES
+import Logo from "src/Assets/apple-icon.png";
+import ForgotPasswordImage from "src/Assets/forgotpassword/forgot-password.svg";
+// STYLE
+import style from "src/Pages/ForgotPassword/ForgotPassword.style";
 
 const api = new Api();
 
-const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): JSX.Element => {
+const ForgotPassword = (): JSX.Element => {
+	const navigate = useNavigate();
 	const { enqueueSnackbar } = useSnackbar();
 	const dispatch = useAppDispatch();
 
@@ -114,15 +113,10 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): 
 
 				setDisabled({ ...disabled, button: false });
 
-				setTimeout(() => {
-					handleForgotModal();
-				}, 500);
+				navigate("/");
 			} catch (error: any) {
 				if (api.isApiError(error)) {
 					enqueueSnackbar(error.response?.data?.message || "Something wrong!", { variant: "error" });
-					setTimeout(() => {
-						handleForgotModal();
-					}, 500);
 				} else console.log(error);
 
 				setDisabled({ ...disabled, button: false });
@@ -131,15 +125,24 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): 
 	};
 
 	return (
-		<CommonModal title="Forgot Password" modalOpen={openForgotModal} handleChangeModal={handleForgotModal}>
-			<Grid container direction="column">
-				<FormControl sx={{ mt: 1 }} variant="standard">
+		<Grid container direction="row" height="100vh" alignItems={{ xs: "unset", md: "center" }} flexWrap="nowrap">
+			<Grid sx={style.forgotPassCardWrapper} container direction="column" justifyContent={{ xs: "unset", md: "center" }} py="50px">
+				<Typography component="div" color="#5FC690" fontSize="26px" mb="30px" display="flex" alignItems="center">
+					<img style={{ height: "30px", marginRight: "10px" }} src={Logo} alt="..." />
+					Reactive Templates
+				</Typography>
+				<Typography component="h2" color="#5FC690" fontSize="30px">
+					Reset your password
+				</Typography>
+
+				<FormControl sx={{ mt: 5, ...style.inputGreen }} variant="outlined">
 					<InputLabel htmlFor="forgot-email">Email Address</InputLabel>
-					<Input
-						id="forgot-email"
+					<OutlinedInput
 						type="email"
-						value={details.email}
 						name="email"
+						id="forgot-email"
+						label="Email Address"
+						value={details.email}
 						onChange={handleChangeInput}
 						endAdornment={
 							loading.email ? (
@@ -156,14 +159,15 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): 
 					<FormHelperText>{emailHelper}</FormHelperText>
 				</FormControl>
 
-				<FormControl sx={{ mt: 1 }} variant="standard">
+				<FormControl sx={{ mt: 3, ...style.inputGreen }} variant="outlined">
 					<InputLabel htmlFor="forgot-otp">OTP</InputLabel>
-					<Input
-						id="forgot-otp"
+					<OutlinedInput
+						name="otp"
 						type="text"
+						label="OTP"
+						id="forgot-otp"
 						disabled={disabled.otp}
 						value={details.otp}
-						name="otp"
 						onChange={handleChangeInput}
 						endAdornment={
 							<InputAdornment position="end">
@@ -176,15 +180,16 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): 
 					<FormHelperText>{otpHelper}</FormHelperText>
 				</FormControl>
 
-				<FormControl sx={{ mt: 1 }} variant="standard">
+				<FormControl sx={{ mt: 3, ...style.inputGreen }} variant="outlined">
 					<InputLabel htmlFor="forgot-password">New Password</InputLabel>
-					<Input
-						id="forgot-password"
-						disabled={disabled.password}
-						type={showpassword ? "text" : "password"}
-						value={details.password}
+					<OutlinedInput
 						name="password"
+						id="forgot-password"
+						label="New Password"
+						value={details.password}
+						disabled={disabled.password}
 						onChange={handleChangeInput}
+						type={showpassword ? "text" : "password"}
 						endAdornment={
 							<InputAdornment position="end">
 								<IconButton disabled={disabled.password} aria-label="toggle password visibility" onClick={handleChangeShowPassword}>
@@ -195,12 +200,16 @@ const ForgotModal = ({ openForgotModal, handleForgotModal }: ForgotModalProps): 
 					/>
 				</FormControl>
 
-				<Button variant="contained" color="primary" type="submit" onClick={handleForgotPass} disabled={disabled.button} sx={{ mt: 3, mb: 2 }}>
+				<Button sx={style.resetPasswordButton} type="submit" color="warning" variant="contained" onClick={handleForgotPass} disabled={disabled.button}>
 					Reset Password
 				</Button>
 			</Grid>
-		</CommonModal>
+
+			<Grid sx={style.imageWrapper} container justifyContent="center" alignItems="center" py="20px">
+				<img style={{ height: "calc(90vh - 40px)", width: "90%" }} src={ForgotPasswordImage} alt="..." />
+			</Grid>
+		</Grid>
 	);
 };
 
-export default ForgotModal;
+export default ForgotPassword;
